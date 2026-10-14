@@ -1,0 +1,24 @@
+name: Deballer le zip
+on: push
+permissions:
+  contents: write
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deballer
+        run: |
+          if ! ls ./*.zip >/dev/null 2>&1; then echo "Pas de zip"; exit 0; fi
+          mkdir _tmp
+          unzip -q -o ./*.zip -d _tmp
+          SRC=$(dirname "$(find _tmp -name index.html | head -n 1)")
+          cp -r "$SRC"/. .
+          rm -rf _tmp ./*.zip
+      - name: Commit
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "Ajout de l'application"
+          git push
