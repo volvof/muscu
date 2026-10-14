@@ -18,7 +18,7 @@
 
 :root{
   --bg:#F1F4F8; --surface:#FFFFFF; --ink:#0F1B2D; --muted:#5B6878; --line:#D8DFE8; --prop:#B4BFCD; --on-c:#FFFFFF;
-  --push:#D6334C; --pull:#2457E6; --legs:#13875C; --upper:#7142D6; --lower:#B87500; --good:#13875C; --bad:#C23B2E;
+  --push:#D6334C; --pull:#2457E6; --legs:#13875C; --upper:#7142D6; --lower:#B87500; --abs:#0A7F96; --rest:#5E6B7E; --good:#13875C; --bad:#C23B2E;
   --nav-h:58px; --done-t:#7CF0B8;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
@@ -27,12 +27,12 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0C1320; --surface:#152033; --ink:#EAF0F8; --muted:#9AA9BC; --line:#25324A; --prop:#3B4C69; --on-c:#0C1320;
-    --push:#FF6B80; --pull:#7FA2FF; --legs:#3DD6A0; --upper:#B197FF; --lower:#F0B03A; --good:#3DD6A0; --bad:#FF8A7D; --done-t:#0E7A52;
+    --push:#FF6B80; --pull:#7FA2FF; --legs:#3DD6A0; --upper:#B197FF; --lower:#F0B03A; --abs:#4CCBE3; --rest:#A8B3C6; --good:#3DD6A0; --bad:#FF8A7D; --done-t:#0E7A52;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0C1320; --surface:#152033; --ink:#EAF0F8; --muted:#9AA9BC; --line:#25324A; --prop:#3B4C69; --on-c:#0C1320;
-  --push:#FF6B80; --pull:#7FA2FF; --legs:#3DD6A0; --upper:#B197FF; --lower:#F0B03A; --good:#3DD6A0; --bad:#FF8A7D; --done-t:#0E7A52;
+  --push:#FF6B80; --pull:#7FA2FF; --legs:#3DD6A0; --upper:#B197FF; --lower:#F0B03A; --abs:#4CCBE3; --rest:#A8B3C6; --good:#3DD6A0; --bad:#FF8A7D; --done-t:#0E7A52;
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 *,*::before,*::after{box-sizing:inherit}
@@ -380,6 +380,20 @@ textarea{display:block;width:100%;border-radius:10px;border:2px solid var(--line
 #toast[hidden]{display:none}
 @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}}
 
+/* jour de repos */
+.restcard{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--c);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.restcard h3{margin:0 0 6px;font-size:1.02rem}
+.restcard p{margin:0 0 6px;color:var(--muted);font-size:.93rem}
+.restcard ul{margin:6px 0 0;padding-left:20px;color:var(--muted);font-size:.93rem}
+.restcard li{margin-bottom:4px}
+.restcard li b{color:var(--ink)}
+.restcard .ghost{margin-top:8px}
+.nextup{display:flex;align-items:center;gap:12px}
+.nextup i{flex:0 0 auto;width:10px;height:36px;border-radius:5px;background:var(--nc)}
+.nextup div{min-width:0}
+.nextup b{display:block}
+.nextup span{color:var(--muted);font-size:.9rem}
+
 </style>
 </head>
 <body>
@@ -460,6 +474,7 @@ var Fig=(function(){
     else{var l=j.leg;j.leg2={K:add(l.K,FAR),A:add(l.A,FAR),toe:add(l.toe,FAR),heel:add(l.heel,FAR)}}
     j.H2=add(H,FAR);
     j.S2=add(S,FAR);
+    if(p.armB)j.arm2=limbArm(j.S2,p.armB);
     return j;
   }
   function mirrorX(pt){return [160-pt[0],pt[1]]}
@@ -482,6 +497,7 @@ var Fig=(function(){
 
   /* ---------- Scènes ---------- */
   var ST='<rect class="pp" ';
+  var MAT='<rect class="pp" x="14" y="88.4" width="132" height="2.6" rx="1.3"/>';
   var SC={
     press_flat:{label:'Développé couché',v:'s',
       prop:ST+'x="38" y="63" width="80" height="6" rx="3"/>'+ST+'x="46" y="69" width="4" height="21"/>'+ST+'x="104" y="69" width="4" height="21"/>',
@@ -568,7 +584,28 @@ var Fig=(function(){
     pullover:{label:'Pull-over à la poulie',v:'s',
       cab:[112,4],imp:[{on:'hand',r:2.8}],
       a:{hip:[76,50],T:-84,arm:{ua:-52,fa:-55},leg:{foot:[78,87],b:-1}},
-      b:{hip:[76,50],T:-84,arm:{ua:78,fa:82},leg:{foot:[78,87],b:-1}}}
+      b:{hip:[76,50],T:-84,arm:{ua:78,fa:82},leg:{foot:[78,87],b:-1}}},
+    /* ----- séance abdos à la maison : tous les exercices se font au sol, sur un tapis ----- */
+    crunch:{label:'Crunch lent',v:'s',
+      prop:MAT,
+      a:{hip:[96,82.2],T:180,hd:0,arm:{hand:[63.5,77.5],b:1},leg:{foot:[118,85.6],b:-1}},
+      b:{hip:[96,82.2],T:206,hd:-4,arm:{hand:[68.5,70.5],b:1},leg:{foot:[118,85.6],b:-1}}},
+    revcrunch:{label:'Relevé de bassin au sol',v:'s',
+      prop:MAT,
+      a:{sh:[73,82.2],T:180,arm:{ua:14,fa:4},leg:{th:-90,sh:0},ft:-70},
+      b:{sh:[73,82.2],T:171,arm:{ua:14,fa:4},leg:{th:-120,sh:-30},ft:-100}},
+    deadbug:{label:'Dead bug',v:'s',
+      prop:MAT,
+      a:{sh:[73,82.2],T:180,arm:{ua:-90,fa:-90},armB:{ua:-90,fa:-90},leg:{th:-90,sh:0},leg2:{th:-90,sh:0},ft:-70,ft2:-70},
+      b:{sh:[73,82.2],T:180,arm:{ua:-130,fa:-165},armB:{ua:-90,fa:-90},leg:{th:-90,sh:0},leg2:{th:-8,sh:-4},ft:-70,ft2:-30}},
+    plank:{label:'Planche sur les avant-bras',v:'s',
+      prop:MAT,
+      a:{sh:[50,72.9],T:184.9,hd:12,arm:{ua:90,fa:180},leg:{foot:[112,78.5],b:-1},ft:62},
+      b:{sh:[50,72.9],T:184.9,hd:12,arm:{ua:90,fa:180},leg:{foot:[112,78.5],b:-1},ft:62}},
+    sideplank:{label:'Planche latérale',v:'s',
+      prop:MAT,
+      a:{sh:[50,72.9],T:200,hd:8,arm:{ua:-82,fa:-92},armB:{ua:90,fa:180},leg:{foot:[111,85.3],b:-1},ft:0},
+      b:{sh:[50,72.9],T:191.5,hd:8,arm:{ua:-82,fa:-92},armB:{ua:90,fa:180},leg:{foot:[111,85.3],b:-1},ft:0}}
   };
 
   /* ---------- Dessin ---------- */
@@ -703,7 +740,8 @@ var Muscles=(function(){
   var NAMES={
     chest:'Pectoraux',delt_f:'Épaules (avant)',delt_s:'Épaules (côté)',delt_r:'Épaules (arrière)',
     biceps:'Biceps',triceps:'Triceps',forearm:'Avant-bras',abs:'Abdos',lats:'Dorsaux',traps:'Trapèzes',
-    lowback:'Lombaires',glutes:'Fessiers',quads:'Quadriceps',hams:'Ischio-jambiers',calves:'Mollets',adduct:'Adducteurs'
+    lowback:'Lombaires',glutes:'Fessiers',quads:'Quadriceps',hams:'Ischio-jambiers',calves:'Mollets',adduct:'Adducteurs',
+    obl:'Obliques'
   };
   var BY_ICON={
     press_flat:{p:['chest'],s:['delt_f','triceps']},
@@ -724,7 +762,12 @@ var Muscles=(function(){
     lunge:{p:['quads','glutes'],s:['hams','adduct']},
     hipthrust:{p:['glutes'],s:['hams','adduct']},
     squat:{p:['quads','glutes'],s:['adduct','abs','lowback']},
-    pullover:{p:['lats'],s:['chest','triceps','abs']}
+    pullover:{p:['lats'],s:['chest','triceps','abs']},
+    crunch:{p:['abs'],s:['obl']},
+    revcrunch:{p:['abs'],s:['obl','adduct']},
+    deadbug:{p:['abs'],s:['obl','quads']},
+    plank:{p:['abs','obl'],s:['delt_f','glutes','lowback']},
+    sideplank:{p:['obl'],s:['abs','delt_s','glutes','lowback']}
   };
   /* exceptions par exercice (id) */
   var OVR={
@@ -745,6 +788,7 @@ var Muscles=(function(){
     ['delt_s','circle','cx="21" cy="46" r="7.2"',1],
     ['delt_f','circle','cx="31" cy="44.5" r="6.2"',1],
     ['chest','path','M51 40 C58 38 68 41 72 47 C73 57 67 65 58 65.5 C54 65.5 51 63 51 60 Z',1],
+    ['obl','path','M31.4 70 C36.5 70 40.6 76 41.3 86 L41.3 102 C37.6 101 34.2 99 32.6 95 C31.2 88 30.8 78 31.4 70 Z',1],
     ['abs','rect','x="43.2" y="68" width="6.2" height="10.6" rx="2"',1],
     ['abs','rect','x="43.2" y="80" width="6.2" height="10.6" rx="2"',1],
     ['abs','rect','x="43.2" y="92" width="6.2" height="11" rx="2"',1],
@@ -810,7 +854,7 @@ var Muscles=(function(){
 <script>
 (function(){
   'use strict';
-  var VERSION='1.0';
+  var VERSION='1.1';
 
 /* ================= Programme ================= */
   var DAYS_A=[
@@ -895,6 +939,17 @@ var Muscles=(function(){
       {id:'b-dim-mollets',alias:'dim-mollets',n:'Mollets assis',s:4,r:'12-20',rest:'1,5 min',sec:90,i:'calf',cue:'Pause en bas, amplitude complète.',q:'mollets assis technique'}
     ]}
   ];
+  /* Lundi (abdos à la maison) et mardi (repos) : identiques dans les deux programmes, l'historique est donc partagé. */
+  var DAY_LUN={key:'lun',dow:1,name:'Lundi',tag:'Abdos',c:'abs',sub:'Abdos et gainage, à la maison, sans matériel',dur:'20 à 25 min',shared:true,ex:[
+    {id:'lun-crunch',bw:1,n:'Crunch lent, mains derrière la tête',s:3,r:'12-20',rest:'1 min',sec:60,i:'crunch',nx:'bras tendus au-dessus de la tête, ou un sac à dos sur la poitrine',cue:'Bas du dos plaqué au sol. Enroule les côtes vers le bassin, 1 s en haut, descente en 3 s. Ne tire pas sur la nuque.',q:'crunch abdos technique'},
+    {id:'lun-revcrunch',bw:1,n:'Relevé de bassin au sol (reverse crunch)',s:3,r:'12-20',rest:'1 min',sec:60,i:'revcrunch',nx:'descente en 4 s, ou jambes tendues',cue:'Genoux à 90° au-dessus des hanches. Décolle le bassin en enroulant, sans balancer les jambes. Descente très lente.',q:'reverse crunch relevé de bassin technique'},
+    {id:'lun-deadbug',bw:1,n:'Dead bug (bras et jambe opposés)',s:3,r:'8-12 / côté',rest:'1 min',sec:60,i:'deadbug',nx:'jambe et bras plus tendus, ou pause de 2 s en bas',cue:'Bas du dos plaqué au sol pendant tout le mouvement. Étends le bras et la jambe opposés, expire en allant au bout. Note les reps par côté.',q:'dead bug exercice technique'},
+    {id:'lun-plank',bw:1,u:'s',n:'Planche sur les avant-bras',s:3,r:'30-60 s',rest:'1 min',sec:60,i:'plank',nx:'planche bras tendus loin devant, ou 4 s de bassin serré en plus',cue:'Coudes sous les épaules. Serre les fessiers et rentre légèrement le bassin : le corps forme une ligne. Arrête quand le bas du dos se creuse.',q:'planche gainage avant-bras technique'},
+    {id:'lun-sideplank',bw:1,u:'s',n:'Planche latérale',s:2,r:'20-45 s',rest:'1 min',sec:60,i:'sideplank',nx:'jambe du dessus levée, ou montées et descentes du bassin',cue:'Coude sous l\'épaule, hanche haute, corps aligné. Note les secondes du côté le plus faible, puis fais le même temps de l\'autre côté.',q:'planche latérale technique'}
+  ]};
+  var DAY_MAR={key:'mar',dow:2,name:'Mardi',tag:'Repos',c:'rest',sub:'Récupération complète',rest:true,ex:[]};
+  DAYS_A.unshift(DAY_LUN,DAY_MAR);
+  DAYS_B.unshift(DAY_LUN,DAY_MAR);
   var PROGS={
     A:{label:'A · Base',note:'Programme A : semaines 1 à 8. Ne le change pas avant d\'avoir une vraie base de progression.',days:DAYS_A},
     B:{label:'B · Variation',note:'Programme B : à lancer après 8 à 12 semaines de A. Mêmes séances, exercices et fourchettes de reps variés. Les exercices identiques gardent leur historique.',days:DAYS_B}
@@ -939,8 +994,11 @@ var Muscles=(function(){
     for(var i=0;i<n;i++){if(rp[i]>0||s[i]===1)c++}
     return c;
   }
-  function e1rmOf(h){return h.max>0?h.w*(1+h.max/30):h.w}
-  function tonOf(h){var t=0;h.reps.forEach(function(r){if(r>0)t+=h.w*r});return t}
+  /* exercices au poids du corps (bw) : pas de charge, le score est le total de reps (ou de secondes) de la séance */
+  function e1rmOf(h){return h.bw?h.tot:(h.max>0?h.w*(1+h.max/30):h.w)}
+  function tonOf(h){var t=0;if(h.bw)return 0;h.reps.forEach(function(r){if(r>0)t+=h.w*r});return t}
+  function isSec(ex){return !!(ex&&ex.u==='s')}
+  function logged(ex,e){return ex&&ex.bw?repsOf(e).reps.some(function(x){return x>0}):e.w>0}
   function range(r){var m=/(\d+)\s*-\s*(\d+)/.exec(r);return m?{lo:+m[1],hi:+m[2]}:{lo:8,hi:12}}
 
   /* ================= Stockage local ================= */
@@ -1010,9 +1068,9 @@ var Muscles=(function(){
     queueWrite();markDone();updateStatus();
   }
   function canon(id){var e=EXMAP[id];return e&&e.alias?e.alias:id}
-  function stats(date,e){
+  function stats(date,e,bw){
     var rp=repsOf(e),pos=rp.reps.filter(function(x){return x>0});
-    return {date:date,w:e.w,reps:rp.reps,lg:rp.lg,sets:setsDone(e),
+    return {date:date,w:bw?0:e.w,bw:!!bw,tot:pos.reduce(function(a,b){return a+b},0),reps:rp.reps,lg:rp.lg,sets:setsDone(e),
       min:pos.length?Math.min.apply(null,pos):0,max:pos.length?Math.max.apply(null,pos):0};
   }
   function history(exId){
@@ -1022,9 +1080,9 @@ var Muscles=(function(){
       if(d.kind!=='session'||!d.ex)return;
       Object.keys(d.ex).forEach(function(xid){
         if(canon(xid)!==c)return;
-        var e=d.ex[xid];
-        if(!(e.w>0))return;
-        out.push(stats(d.date,e));
+        var e=d.ex[xid],x=EXMAP[xid];
+        if(!logged(x,e))return;
+        out.push(stats(d.date,e,!!(x&&x.bw)));
       });
     });
     out.sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0});
@@ -1040,7 +1098,9 @@ var Muscles=(function(){
   /* un record = meilleure force estimée, ou charge la plus lourde, battue par rapport à toutes les séances précédentes */
   function prInfo(h,hist){
     var prev=before(hist,h.date);
-    if(!prev.length||!(h.w>0))return null;
+    if(!prev.length)return null;
+    if(h.bw){var bt=0;prev.forEach(function(x){if(x.tot>bt)bt=x.tot});return h.tot>bt?{charge:false,force:true}:null}
+    if(!(h.w>0))return null;
     var bw=0,be=0;
     prev.forEach(function(x){if(x.w>bw)bw=x.w;var v=e1rmOf(x);if(v>be)be=v});
     var o={charge:h.w>bw+0.001,force:e1rmOf(h)>be*1.005};
@@ -1219,6 +1279,11 @@ var Muscles=(function(){
   }
   function goalHtml(ex,pr,rec){
     var rg=range(ex.r),h;
+    if(ex.bw){
+      if(!pr)return '<p class="goal">Première fois : fais des séries propres, arrête-toi quand la forme se dégrade, et note ce que tu fais.</p>';
+      if(pr.min>=rg.hi)return '<p class="goal">Objectif : <b>fourchette atteinte sur toutes les séries</b>. Passe à une variante plus dure ('+esc(ex.nx||'plus lente ou plus longue')+'), puis repars du bas de la fourchette.</p>';
+      return '<p class="goal">Objectif : bats tes '+(isSec(ex)?'secondes':'reps')+' de la dernière fois série par série, jusqu\'à <b>'+rg.hi+'</b> partout.</p>';
+    }
     if(!pr)return '<p class="goal">Première fois : prends une charge qui te laisse 1-2 répétitions en réserve et note-la.</p>';
     if(!(pr.min>0))h='Objectif : reprends <b>'+num(pr.w)+' kg</b> et note tes reps série par série pour suivre ta progression.';
     else if(pr.min>=rg.hi&&!pr.lg)h='Objectif : <b>monte d\'un cran (≈ '+num(targetOf(ex,pr).w)+' kg)</b>, vise '+rg.lo+' reps ou plus sur chaque série.';
@@ -1227,20 +1292,21 @@ var Muscles=(function(){
     return '<p class="goal">'+h+'</p>';
   }
   function deltaInfo(ex,e,pr){
-    if(!pr||!(e.w>0))return {t:'',c:''};
-    var dw=Math.round((e.w-pr.w)*100)/100;
+    var bw=!!ex.bw;
+    if(!pr||!logged(ex,e))return {t:'',c:''};
+    var dw=bw?0:Math.round((e.w-pr.w)*100)/100;
     if(dw>0)return {t:'+'+num(dw)+' kg depuis le '+fmtDate(pr.date),c:'up'};
     if(dw<0)return {t:num(dw)+' kg depuis le '+fmtDate(pr.date),c:'down'};
     var cur=repsOf(e).reps,m=Math.min(cur.length,pr.reps.length),diff=0,cmp=0,i;
     for(i=0;i<m;i++){if(cur[i]>0&&pr.reps[i]>0){diff+=cur[i]-pr.reps[i];cmp++}}
     var parts=[],c='eq';
     if(!pr.lg&&cmp>0&&diff!==0){
-      parts.push((diff>0?'+':'')+diff+' rep'+(Math.abs(diff)>1?'s':'')+' à charge égale');
+      parts.push((diff>0?'+':'')+diff+(bw&&isSec(ex)?' s':' rep'+(Math.abs(diff)>1?'s':''))+(bw?'':' à charge égale'));
       c=diff>0?'up':'down';
     }
     var ds=setsDone(e)-pr.sets;
     if(pr.sets>0&&ds>0){parts.push('+'+ds+' série'+(ds>1?'s':''));if(c==='eq')c='up'}
-    if(!parts.length)return {t:cmp>0&&!pr.lg?'Identique à la dernière fois':'Même charge que la dernière fois',c:'eq'};
+    if(!parts.length)return {t:(cmp>0&&!pr.lg)||bw?'Identique à la dernière fois':'Même charge que la dernière fois',c:'eq'};
     return {t:parts.join(' · '),c:c};
   }
   function setDelta(val,prev,lg){
@@ -1253,15 +1319,22 @@ var Muscles=(function(){
     if(!pos.length)return '?';
     return h.lg?('≥ '+pos[0]):pos.join(' · ');
   }
+  function perfText(h,ex){
+    if(ex&&ex.bw){
+      var pos=h.reps.filter(function(x){return x>0});
+      return pos.length?pos.join(' · ')+(isSec(ex)?' s':' reps'):'?';
+    }
+    return num(h.w)+' kg × '+repsText(h);
+  }
   function rowsHtml(ex,e,pr,key){
     var reps=e.reps||[],done=e.s||[],pv_=pr?pr.reps:[],lg=!!(pr&&pr.lg);
-    var n=Math.max(ex.s,reps.length,done.length,extra[key]||0),h='';
+    var n=Math.max(ex.s,reps.length,done.length,extra[key]||0),h='',sec=isSec(ex);
     for(var i=0;i<n;i++){
       var val=reps[i]>0?reps[i]:'',prev=pv_[i]>0?pv_[i]:0,sd=setDelta(val,prev,lg);
       h+='<div class="srow" data-prev="'+prev+'" data-lg="'+(lg?1:0)+'">'
         +'<button type="button" class="setbtn" aria-pressed="'+(done[i]===1?'true':'false')+'" aria-label="Série '+(i+1)+' faite : lancer le repos">'+(i+1)+'</button>'
-        +'<input type="text" inputmode="numeric" pattern="[0-9]*" enterkeyhint="next" class="sr" value="'+val+'" placeholder="reps" aria-label="Répétitions de la série '+(i+1)+'">'
-        +'<span class="sprev">'+(prev?'Avant : '+(lg?'≥ ':'')+prev:'')+'</span>'
+        +'<input type="text" inputmode="numeric" pattern="[0-9]*" enterkeyhint="next" class="sr" value="'+val+'" placeholder="'+(sec?'sec':'reps')+'" aria-label="'+(sec?'Secondes':'Répétitions')+' de la série '+(i+1)+'">'
+        +'<span class="sprev">'+(prev?'Avant : '+(lg?'≥ ':'')+prev+(sec?' s':''):'')+'</span>'
         +'<span class="sdel '+sd.c+'">'+sd.t+'</span></div>';
     }
     return h;
@@ -1292,13 +1365,32 @@ var Muscles=(function(){
     m.s.forEach(function(k){h+='<span class="mc s">'+Muscles.NAMES[k]+'</span>'});
     return h+'</div>';
   }
+  function nextTraining(d){
+    var i=DAYS.indexOf(d),n=DAYS.length;
+    for(var k=1;k<=n;k++){var x=DAYS[(i+k)%n];if(!x.rest)return x}
+    return null;
+  }
+  function renderRest(d){
+    var nx=nextTraining(d);
+    var h='<div style="--c:var(--'+d.c+')"><div class="dayhead"><div class="when">'+d.name+'</div><h2>Repos</h2><p>'+d.sub+' · aucune séance</p></div>'
+      +'<div class="restcard"><h3>Pas de séance aujourd\'hui</h3><p>Le muscle se construit pendant la récupération, pas pendant la séance. Après six séances dans la semaine, c\'est ce jour-là que tu rattrapes la fatigue. Si tu le sautes, tu le paies à la séance suivante.</p></div>'
+      +'<div class="restcard"><h3>Ce qui reste au programme</h3><ul>'
+      +'<li><b>Dormir</b> 7 h minimum : c\'est la moitié du travail.</li>'
+      +'<li><b>Manger</b> comme les autres jours, avec environ 180 g de protéines. Pas de jour de jeûne.</li>'
+      +'<li><b>Marcher</b> 8 000 à 10 000 pas, tranquillement, sans chercher à t\'épuiser.</li>'
+      +'<li><b>Te peser</b> le matin à jeun : c\'est la mesure qui te dit si la recomposition marche.</li></ul>'
+      +'<button type="button" class="ghost" id="gobody">Noter mon poids et mon tour de taille</button></div>';
+    if(nx)h+='<div class="restcard nextup" style="--nc:var(--'+nx.c+')"><i></i><div><b>Prochaine séance : '+nx.name+' · '+nx.tag+'</b><span>'+nx.sub+' · '+nx.ex.length+' exercices</span></div></div>';
+    main.innerHTML=h+'</div>';
+  }
   function renderSeance(){
     var d=dayOf(curDay),cp=getProg();
+    if(d.rest){renderRest(d);return}
     var h='<div style="--c:var(--'+d.c+')">';
     h+='<div class="seg" role="group" aria-label="Programme">';
     Object.keys(PROGS).forEach(function(k){h+='<button type="button" data-pg="'+k+'" aria-pressed="'+(cp===k?'true':'false')+'">'+PROGS[k].label+'</button>'});
     h+='</div><p class="pgnote">'+esc(PROGS[cp].note)+'</p>';
-    h+='<div class="dayhead"><div class="when">'+d.name+'</div><h2>'+d.tag+'</h2><p>'+d.sub+' · '+d.ex.length+' exercices · 60 à 75 min</p>'
+    h+='<div class="dayhead"><div class="when">'+d.name+'</div><h2>'+d.tag+'</h2><p>'+d.sub+' · '+d.ex.length+' exercices · '+(d.dur||'60 à 75 min')+'</p>'
       +'<div class="datepick"><label for="sdate">Séance du</label><input type="date" id="sdate" value="'+curDate+'" max="'+ymd(new Date())+'"></div></div>';
     if(d.warm){
       h+='<details class="warm" open><summary>Échauffement épaules (5 min)</summary><ol>'
@@ -1310,9 +1402,9 @@ var Muscles=(function(){
     d.ex.forEach(function(ex,idx){
       var e=getEntry(ex.id),hist=history(ex.id),prv=before(hist,curDate),pr=lastOf(prv),rec=bestOf(prv);
       var di=deltaInfo(ex,e,pr),key=curDate+'|'+ex.id;
-      var cur=e.w>0?stats(curDate,e):null,pi=cur?prInfo(cur,hist):null;
+      var bw=!!ex.bw,cur=logged(ex,e)?stats(curDate,e,bw):null,pi=cur?prInfo(cur,hist):null;
       var sp=spark(hist.slice(-8).map(e1rmOf));
-      if(pr&&!(e.w>0))canFill++;
+      if(pr&&!bw&&!(e.w>0))canFill++;
       cards+='<article class="ex" data-ex="'+ex.id+'"><div class="fig"><span class="order">'+(idx+1)+'</span>'
         +'<span class="prb"'+(pi?'':' hidden')+'>Record</span>'
         +'<div class="mv" data-i="'+ex.i+'"></div><div class="mm">'+Muscles.html(ex)+'</div></div><div class="body">'
@@ -1320,7 +1412,10 @@ var Muscles=(function(){
         +'<div class="meta"><span class="chip">'+ex.s+' × '+ex.r+'</span><span class="chip soft">Repos '+ex.rest+'</span></div>'
         +musChips(ex)
         +'<p class="cue">'+esc(ex.cue)+'</p>';
-      if(pr){
+      if(pr&&bw){
+        cards+='<div class="prior none"><span class="ph"><small>Dernière fois · '+fmtDate(pr.date)+'</small></span>'
+          +'<span class="pbx"><b>'+perfText(pr,ex)+'</b>'+(sp?'<span class="spk" aria-hidden="true">'+sp+'</span>':'')+'</span></div>';
+      }else if(pr){
         cards+='<button type="button" class="prior" data-w="'+pr.w+'"><span class="ph"><small>Dernière fois · '+fmtDate(pr.date)+'</small><em>Même charge</em></span>'
           +'<span class="pbx"><b>'+num(pr.w)+' kg × '+repsText(pr)+'</b>'+(sp?'<span class="spk" aria-hidden="true">'+sp+'</span>':'')+'</span></button>';
       }else{
@@ -1328,9 +1423,9 @@ var Muscles=(function(){
       }
       cards+=goalHtml(ex,pr,rec);
       cards+='<div class="row"><div class="fields">'
-        +'<label class="fld">Charge (kg)<input type="text" inputmode="decimal" class="inw" value="'+(e.w>0?num(e.w):'')+'" placeholder="'+(pr?num(pr.w):'0')+'"></label></div>'
+        +(bw?'<span class="chip soft">Poids du corps</span>':'<label class="fld">Charge (kg)<input type="text" inputmode="decimal" class="inw" value="'+(e.w>0?num(e.w):'')+'" placeholder="'+(pr?num(pr.w):'0')+'"></label>')+'</div>'
         +'<a class="yt" href="https://www.youtube.com/results?search_query='+encodeURIComponent(ex.q)+'" target="_blank" rel="noopener">Voir la technique</a></div>'
-        +'<div class="shead"><span>Série</span><span>Reps</span><span>Dernière fois</span></div>'
+        +'<div class="shead"><span>Série</span><span>'+(isSec(ex)?'Secondes':'Reps')+'</span><span>Dernière fois</span></div>'
         +'<div class="srows" role="group" aria-label="Séries">'+rowsHtml(ex,e,pr,key)+'</div>'
         +(e.r>0&&!Array.isArray(e.reps)?'<p class="legacy">Saisie précédente : '+e.r+' reps (la plus faible des séries).</p>':'')
         +'<button type="button" class="ghost addset">+ Série</button>'
@@ -1369,8 +1464,8 @@ var Muscles=(function(){
       var e=d.ex[id],ex=EXMAP[id];
       if(!ex||!(e.w>0||setsDone(e)>0))return;
       sets+=setsDone(e);
-      if(!(e.w>0)){rows.push({ex:ex,cur:null,cmp:'none'});return}
-      var h=stats(d.date,e),hist=history(id),prv=lastOf(before(hist,d.date));
+      if(!logged(ex,e)){rows.push({ex:ex,cur:null,cmp:'none'});return}
+      var h=stats(d.date,e,!!ex.bw),hist=history(id),prv=lastOf(before(hist,d.date));
       var pi=prInfo(h,hist),c=pi?'up':cmpStats(h,prv);
       if(c==='up')up++;else if(c==='down')down++;else if(c==='eq')eq++;
       if(pi)prs.push({ex:ex,pi:pi,h:h});
@@ -1392,14 +1487,15 @@ var Muscles=(function(){
       +'<button type="button" class="xbtn" id="rcclose" aria-label="Fermer">×</button></div>';
     h+='<div class="stats4">'
       +'<div class="stat"><b>'+(r.dur?r.dur+' min':'–')+'</b><small>durée</small></div>'
-      +'<div class="stat"><b>'+num(Math.round(r.ton/100)/10)+' t</b><small>volume'+(tv===null?'':' · '+(tv>0?'+':'')+tv+' %')+'</small></div>'
+      +(r.ton>0?'<div class="stat"><b>'+num(Math.round(r.ton/100)/10)+' t</b><small>volume'+(tv===null?'':' · '+(tv>0?'+':'')+tv+' %')+'</small></div>'
+        :'<div class="stat"><b>'+r.prs.length+'</b><small>record'+(r.prs.length>1?'s':'')+'</small></div>')
       +'<div class="stat"><b>'+r.sets+'</b><small>séries</small></div>'
       +'<div class="stat"><b>'+r.rows.length+' / '+r.total+'</b><small>exercices</small></div></div>';
     if(tv!==null)h+='<p class="rcnote">Volume comparé à la séance '+r.day.tag+' du '+fmtDate(r.pdate)+'.</p>';
     if(r.prs.length){
       h+='<div class="rcbox pr"><h3>Records battus</h3><ul>';
       r.prs.forEach(function(p){
-        h+='<li><b>'+esc(p.ex.n)+'</b><span>'+num(p.h.w)+' kg × '+repsText(p.h)+(p.pi.charge?' · charge max':' · force estimée')+'</span></li>';
+        h+='<li><b>'+esc(p.ex.n)+'</b><span>'+perfText(p.h,p.ex)+(p.pi.charge?' · charge max':p.h.bw?' · total en hausse':' · force estimée')+'</span></li>';
       });
       h+='</ul></div>';
     }
@@ -1411,8 +1507,8 @@ var Muscles=(function(){
     r.rows.forEach(function(x){
       var cm=CMP[x.cmp];
       h+='<li><div class="rn"><b>'+esc(x.ex.n)+'</b>'
-        +(x.cur?'<span>'+num(x.cur.w)+' kg × '+repsText(x.cur)+'</span>':'<span>Séries cochées, sans charge</span>')
-        +(x.prev&&x.cur?'<small>Avant : '+num(x.prev.w)+' kg × '+repsText(x.prev)+'</small>':'')+'</div>'
+        +(x.cur?'<span>'+perfText(x.cur,x.ex)+'</span>':'<span>Séries cochées, sans '+(x.ex.bw?(isSec(x.ex)?'secondes':'reps'):'charge')+'</span>')
+        +(x.prev&&x.cur?'<small>Avant : '+perfText(x.prev,x.ex)+'</small>':'')+'</div>'
         +'<div class="rc '+x.cmp+'" title="'+cm[1]+'"><i aria-hidden="true">'+cm[0]+'</i><small>'+cm[1]+'</small></div></li>';
     });
     h+='</ul></div>';
@@ -1462,7 +1558,7 @@ var Muscles=(function(){
     });
     var tv=(tonPrev>0&&tonThis>0)?Math.round((tonThis-tonPrev)/tonPrev*100):null;
     return '<div class="stats">'
-      +'<div class="stat"><b>'+thisW+' / 5</b><small>séances cette semaine</small></div>'
+      +'<div class="stat"><b>'+thisW+' / 6</b><small>séances cette semaine</small></div>'
       +'<div class="stat"><b>'+ss.length+'</b><small>séances au total</small></div>'
       +'<div class="stat"><b>'+(tv===null?'–':(tv>0?'+':'')+tv+' %')+'</b><small>volume vs semaine dernière</small></div></div>';
   }
@@ -1476,46 +1572,50 @@ var Muscles=(function(){
     if(!pex||ids.indexOf(pex)<0)pex=ids[0];
     var opts='';
     Object.keys(PROGS).forEach(function(pk){PROGS[pk].days.forEach(function(d){
+      if(d.shared&&pk!=='A')return;
       var o='';
       d.ex.forEach(function(ex){
         if(ids.indexOf(ex.id)>=0)o+='<option value="'+ex.id+'"'+(pex===ex.id?' selected':'')+'>'+esc(ex.n)+'</option>';
       });
-      if(o)opts+='<optgroup label="Programme '+pk+' · '+d.name+' · '+d.tag+'">'+o+'</optgroup>';
+      if(o)opts+='<optgroup label="'+(d.shared?'':'Programme '+pk+' · ')+d.name+' · '+d.tag+'">'+o+'</optgroup>';
     })});
-    var h=history(pex),ex=EXMAP[pex],c=dayOf(ex.day).c;
+    var h=history(pex),ex=EXMAP[pex],c=dayOf(ex.day).c,bw=!!ex.bw;
     /* repère des records : nouvelle meilleure valeur par rapport à toutes les séances précédentes */
     var run=0;
-    h.forEach(function(e,i){var v=pm==='1rm'?e1rmOf(e):e.w;e.isPR=(i>0&&v>run+0.001);if(v>run)run=v});
+    h.forEach(function(e,i){var v=bw?e.tot:pm==='1rm'?e1rmOf(e):e.w;e.isPR=(i>0&&v>run+0.001);if(v>run)run=v});
     var groups={};
     h.forEach(function(e){
       var k=pp==='mois'?e.date.slice(0,7):mondayOf(e.date);
-      var v=pm==='1rm'?e1rmOf(e):e.w;
+      var v=bw?e.tot:pm==='1rm'?e1rmOf(e):e.w;
       if(!groups[k])groups[k]={t:ms(e.date),y:v,k:k,pr:!!e.isPR};
       else{if(v>groups[k].y){groups[k].y=v;groups[k].t=ms(e.date)}if(e.isPR)groups[k].pr=true}
     });
     var points=Object.keys(groups).sort().map(function(k){return groups[k]});
     var f=h[0],l=h[h.length-1],bestE=bestOf(h),bestW=h.reduce(function(a,x){return x.w>a.w?x:a},h[0]);
-    var chg=f.w>0?Math.round((l.w-f.w)/f.w*100):0;
+    var chg=bw?(f.tot>0?Math.round((l.tot-f.tot)/f.tot*100):0):(f.w>0?Math.round((l.w-f.w)/f.w*100):0);
+    var bestSet=h.reduce(function(a,x){return x.max>a?x.max:a},0),bestTot=h.reduce(function(a,x){return x.tot>a?x.tot:a},0);
     var nPR=h.filter(function(e){return prInfo(e,h)}).length;
     var out='<div style="--c:var(--'+c+')">'
       +'<select id="pex" aria-label="Exercice">'+opts+'</select>'
-      +segHtml('pm',[['charge','Charge'],['1rm','Force estimée (1RM)']],pm)
+      +(bw?'':segHtml('pm',[['charge','Charge'],['1rm','Force estimée (1RM)']],pm))
       +segHtml('pp',[['semaine','Par semaine'],['mois','Par mois']],pp)
-      +'<div class="chart"><h3>'+(pm==='1rm'?'Force estimée (1RM)':'Charge')+' · meilleure valeur par '+(pp==='mois'?'mois':'semaine')+'</h3>'
+      +'<div class="chart"><h3>'+(bw?(isSec(ex)?'Temps cumulé (secondes)':'Total de répétitions'):pm==='1rm'?'Force estimée (1RM)':'Charge')+' · meilleure valeur par '+(pp==='mois'?'mois':'semaine')+'</h3>'
       +'<p class="sub">'+esc(ex.n)+(points.some(function(p){return p.pr})?' · <span class="prkey"></span> record':'')+'</p>'
       +lineChart(points,function(v){return num(Math.round(v*2)/2)},function(p){return pp==='mois'?fmtMonth(p.k):fmtDate(ymd(new Date(p.t)))})
       +'</div>'
       +'<div class="stats">'
-      +'<div class="stat"><b>'+num(bestW.w)+' kg</b><small>charge max</small></div>'
-      +'<div class="stat"><b>'+num(Math.round(e1rmOf(bestE)*2)/2)+' kg</b><small>1RM estimé max</small></div>'
+      +(bw?'<div class="stat"><b>'+bestSet+(isSec(ex)?' s':'')+'</b><small>meilleure série</small></div>'
+          +'<div class="stat"><b>'+bestTot+(isSec(ex)?' s':'')+'</b><small>meilleur total</small></div>'
+         :'<div class="stat"><b>'+num(bestW.w)+' kg</b><small>charge max</small></div>'
+          +'<div class="stat"><b>'+num(Math.round(e1rmOf(bestE)*2)/2)+' kg</b><small>1RM estimé max</small></div>')
       +'<div class="stat"><b>'+nPR+'</b><small>records battus</small></div></div>'
       +'<div class="card"><h3>Bilan</h3>'
-      +'<p>Premier relevé : <strong>'+num(f.w)+' kg × '+repsText(f)+'</strong> ('+fmtDate(f.date)+')</p>'
-      +'<p>Dernier relevé : <strong>'+num(l.w)+' kg × '+repsText(l)+'</strong> ('+fmtDate(l.date)+')</p>'
-      +(h.length>1?'<p>Évolution de la charge : <strong>'+(chg>0?'+':'')+chg+' %</strong> sur '+h.length+' séances.</p>':'<p>Un seul relevé pour l\'instant : la courbe se dessine dès la deuxième séance.</p>')
+      +'<p>Premier relevé : <strong>'+perfText(f,ex)+'</strong> ('+fmtDate(f.date)+')</p>'
+      +'<p>Dernier relevé : <strong>'+perfText(l,ex)+'</strong> ('+fmtDate(l.date)+')</p>'
+      +(h.length>1?'<p>Évolution '+(bw?'du total':'de la charge')+' : <strong>'+(chg>0?'+':'')+chg+' %</strong> sur '+h.length+' séances.</p>':'<p>Un seul relevé pour l\'instant : la courbe se dessine dès la deuxième séance.</p>')
       +'</div>';
-    out+='<div class="card"><h3>Historique</h3><table class="tbl"><thead><tr><th>Date</th><th>Charge</th><th>Reps</th></tr></thead><tbody>';
-    h.slice(-8).reverse().forEach(function(e){out+='<tr><td>'+fmtDate(e.date)+(prInfo(e,h)?' <span class="mini">record</span>':'')+'</td><td>'+num(e.w)+' kg</td><td>'+(e.max>0?repsText(e):'–')+'</td></tr>'});
+    out+='<div class="card"><h3>Historique</h3><table class="tbl"><thead><tr><th>Date</th><th>'+(bw?'Séries':'Charge')+'</th><th>'+(bw?'Résultat':'Reps')+'</th></tr></thead><tbody>';
+    h.slice(-8).reverse().forEach(function(e){out+='<tr><td>'+fmtDate(e.date)+(prInfo(e,h)?' <span class="mini">record</span>':'')+'</td><td>'+(bw?e.sets:num(e.w)+' kg')+'</td><td>'+(bw?perfText(e,ex):e.max>0?repsText(e):'–')+'</td></tr>'});
     return out+'</tbody></table></div></div>';
   }
   function weeksBack(n){
@@ -1523,7 +1623,7 @@ var Muscles=(function(){
     for(var i=n-1;i>=0;i--)out.push(addDays(wk,-7*i));
     return out;
   }
-  var MGROUPS=['chest','lats','traps','delt_f','delt_s','delt_r','biceps','triceps','forearm','quads','hams','glutes','calves','abs','lowback','adduct'];
+  var MGROUPS=['chest','lats','traps','delt_f','delt_s','delt_r','biceps','triceps','forearm','quads','hams','glutes','calves','abs','obl','lowback','adduct'];
   var MMAIN={chest:1,lats:1,delt_s:1,delt_r:1,biceps:1,triceps:1,quads:1,hams:1,glutes:1,calves:1};
   function muscleSets(wk){
     var out={};
@@ -1567,7 +1667,7 @@ var Muscles=(function(){
     return '<div style="--c:var(--pull)">'
       +muscleHtml()
       +'<div class="chart"><h3>Volume par semaine</h3><p class="sub">Tonnes soulevées (charge × reps × séries), 12 dernières semaines</p>'+barChart(tItems,function(v){return num(Math.round(v*10)/10)})+'</div>'
-      +'<div class="chart"><h3>Séances par semaine</h3><p class="sub">Objectif : 5</p>'+barChart(cItems,function(v){return String(v)})+'</div></div>';
+      +'<div class="chart"><h3>Séances par semaine</h3><p class="sub">Objectif : 6 (5 en salle + abdos)</p>'+barChart(cItems,function(v){return String(v)})+'</div></div>';
   }
   function bodyView(){
     var be=bodyEntries(),today=ymd(new Date());
@@ -1603,8 +1703,8 @@ var Muscles=(function(){
       var w=mondayOf(d.date),di=dayInfo(d.day),prog=progOfDoc(d);
       if(w!==lastW){h+='<h3 class="jwk">Semaine du '+fmtDate(w)+'</h3>';lastW=w}
       var r=recapData(d),idn=sid(d.day,d.date);
-      h+='<button type="button" class="jrow" data-recap="'+esc(idn)+'" style="--c:var(--'+di.c+')"><span class="jd"><b>'+fmtDateLong(d.date)+'</b><small>'+di.tag+' · programme '+prog+'</small></span>'
-        +'<span class="jm">'+r.rows.length+' exos · '+r.sets+' séries · '+num(Math.round(r.ton/100)/10)+' t</span>'
+      h+='<button type="button" class="jrow" data-recap="'+esc(idn)+'" style="--c:var(--'+di.c+')"><span class="jd"><b>'+fmtDateLong(d.date)+'</b><small>'+di.tag+(di.shared?'':' · programme '+prog)+'</small></span>'
+        +'<span class="jm">'+r.rows.length+' exos · '+r.sets+' séries'+(r.ton>0?' · '+num(Math.round(r.ton/100)/10)+' t':'')+'</span>'
         +(r.prs.length?'<span class="mini prx">'+plural(r.prs.length,'record')+'</span>':'')+'<i aria-hidden="true">›</i></button>';
     });
     if(ss.length>60)h+='<p class="sub">Les 60 dernières séances sont affichées.</p>';
@@ -1625,7 +1725,7 @@ var Muscles=(function(){
     +'<div class="card"><h3>Quand changer de programme</h3><ul><li>Pas avant 8 à 12 semaines : c\'est le temps qu\'il faut pour que la progression de charge se voie.</li><li>Plus tôt seulement si tu stagnes sur la plupart des exercices pendant 3-4 séances, malgré un bon sommeil et une alimentation en règle.</li><li>On change les variantes (angle, prise, machine ou haltères), pas la logique : mouvements de base, double progression, 1-2 reps de marge.</li><li>La « confusion musculaire » est un mythe. Changer toutes les semaines t\'empêche de battre tes anciennes performances, donc de progresser.</li></ul></div>'
     +'<div class="card"><h3>Épaule</h3><ul><li>Gêne légère qui disparaît à l\'échauffement : continue.</li><li>Douleur qui monte pendant une série : change de variante (poulie, machine guidée) ou arrête l\'exercice.</li><li>Si ça revient à chaque séance au même endroit pendant plusieurs semaines : kiné.</li></ul></div>'
     +'<div class="card"><h3>Recomposition</h3><ul><li>Calories : légèrement sous ta maintenance, environ -300 à -400 kcal.</li><li>Protéines : autour de 180 g par jour.</li><li>Poids : moyenne hebdomadaire, vise -0,3 à -0,5 kg par semaine.</li><li>Tour de taille au nombril : ta mesure la plus fiable.</li><li>Sommeil : 7 h minimum.</li></ul></div>'
-    +'<div class="card"><h3>Lundi et mardi</h3><p>Repos, avec de la marche (8 000 à 10 000 pas par jour tous les jours).</p></div>';
+    +'<div class="card"><h3>Lundi et mardi</h3><p><strong>Lundi</strong> : abdos à la maison, 20 à 25 minutes, sans matériel. Mêmes règles qu\'en salle : propre, lent, une ou deux répétitions de marge. Quand tu atteins le haut de la fourchette sur toutes les séries, passe à la variante plus dure indiquée sur la fiche.</p><p><strong>Mardi</strong> : repos complet. Tu marches (8 000 à 10 000 pas par jour, tous les jours), tu dors, tu manges.</p><p>Les abdos ne font pas fondre le ventre : ton tour de taille baisse avec le déficit calorique, pas avec les séries d\'abdos. Cette séance rend le tronc plus fort et plus stable pour tes charges lourdes, rien de plus.</p></div>';
   }
 
   /* ================= Données : export, import, installation ================= */
@@ -1706,7 +1806,7 @@ var Muscles=(function(){
     var txt='﻿'+rows.map(function(r){return r.map(csvEscape).join(';')}).join('\n')+'\n\n'+rows2.map(function(r){return r.map(csvEscape).join(';')}).join('\n');
     saveFile('mon-suivi-musculation.csv',txt,'text/csv',false).then(function(){toast('Fichier CSV téléchargé.')});
   }
-  var DATE_RE=/^\d{4}-\d{2}-\d{2}$/,DAYKEYS=PROGS.A.days.map(function(x){return x.key});
+  var DATE_RE=/^\d{4}-\d{2}-\d{2}$/,DAYKEYS=PROGS.A.days.filter(function(x){return !x.rest}).map(function(x){return x.key});
   function cleanEntry(e){
     if(!e||typeof e!=='object')return null;
     var o={};
@@ -1965,7 +2065,7 @@ var Muscles=(function(){
     var di=deltaInfo(ex,e,pr);
     var p=card.querySelector('.delta');
     p.className='delta '+di.c;p.textContent=di.t;
-    var pi=e.w>0?prInfo(stats(curDate,e),hist):null,b=card.querySelector('.prb');
+    var pi=logged(ex,e)?prInfo(stats(curDate,e,!!ex.bw),hist):null,b=card.querySelector('.prb');
     if(b)b.hidden=!pi;
     var fin=document.getElementById('finish');
     if(fin){var cd=S.docs[sid(curDay,curDate)];fin.disabled=!(cd&&sessionDone(cd))}
@@ -1993,7 +2093,7 @@ var Muscles=(function(){
   function fillLoads(){
     var d=dayOf(curDay),n=0;
     d.ex.forEach(function(ex){
-      if(getEntry(ex.id).w>0)return;
+      if(ex.bw||getEntry(ex.id).w>0)return;
       var pr=lastOf(before(history(ex.id),curDate)),t=targetOf(ex,pr);
       if(t){setEntry(ex.id,{w:t.w});n++}
     });
@@ -2049,6 +2149,7 @@ var Muscles=(function(){
       setEntry(eid,{w:w});refreshDelta(c);
       return;
     }
+    if(t.closest('#gobody')){pv='corps';go('progres');return}
     if(t.closest('#finish')){finishSession();return}
     if(t.closest('#fill')){fillLoads();return}
     if(t.closest('#reset')){
