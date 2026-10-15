@@ -552,11 +552,11 @@ var Fig=(function(){
       imp:[{on:'hand',r:4.4}],
       a:{hip:[80,49],T:-90,arm:{ua:92,fa:90},leg:{foot:[80,87],b:-1}},
       b:{hip:[67,52],T:-25,hd:-20,arm:{ua:90,fa:95},leg:{foot:[80,87],b:-1}}},
-    legcurl:{label:'Leg curl',v:'s',
-      prop:ST+'x="34" y="62" width="70" height="6" rx="3"/>'+ST+'x="40" y="68" width="4" height="22"/>'+ST+'x="94" y="68" width="4" height="22"/>',
-      imp:[{on:'ankle',r:3.4}],
-      a:{hip:[88,57],T:180,arm:{hand:[46,60],b:-1},leg:{th:0,sh:0},ft:90},
-      b:{hip:[88,57],T:180,arm:{hand:[46,60],b:-1},leg:{th:0,sh:-115},ft:80}},
+    legcurl:{label:'Leg curl assis',v:'s',
+      prop:'<path class="pl" d="M63 72 L66 36"/>'+ST+'x="62" y="71" width="38" height="5" rx="2"/>'+ST+'x="76" y="76" width="4" height="14"/>'+ST+'x="80" y="56" width="16" height="4" rx="2"/>',
+      imp:[{on:'ankle',r:3.4,dx:-0.6,dy:3}],
+      a:{hip:[70,66],T:-90,arm:{hand:[80,63],b:1},leg:{th:2,sh:-8},ft:-75},
+      b:{hip:[70,66],T:-90,arm:{hand:[80,63],b:1},leg:{th:2,sh:96},ft:5}},
     legext:{label:'Leg extension',v:'s',
       prop:'<path class="pl" d="M63 73 L62 34"/>'+ST+'x="56" y="72" width="42" height="5" rx="2"/>'+ST+'x="60" y="77" width="4" height="13"/>'+ST+'x="90" y="77" width="4" height="13"/>',
       imp:[{on:'ankle',r:3}],
@@ -581,6 +581,19 @@ var Fig=(function(){
       imp:[{on:'hand',r:4.4}],
       a:{hip:[80,49],T:-90,arm:{hand:[86,35],b:1},leg:{foot:[78,87],b:-1}},
       b:{hip:[62,67],T:-48,arm:{hand:[83,57],b:1},leg:{foot:[78,87],b:-1}}},
+    calfseat:{label:'Mollets assis',v:'s',
+      prop:ST+'x="56" y="71" width="44" height="5" rx="2"/>'+ST+'x="62" y="76" width="4" height="14"/>'+ST+'x="90" y="76" width="4" height="14"/>',
+      imp:[{on:'hand',r:4.4}],
+      a:{hip:[72,68],T:-86,arm:{hand:[90,59],b:1},leg:{th:0,sh:90},ft:0},
+      b:{hip:[72,68],T:-86,arm:{hand:[89.5,54.5],b:1},leg:{th:-14,sh:81.5},ft:38}},
+    calfpress:{label:'Mollets à la presse',v:'s',plat:true,
+      prop:'<path class="pl" d="M53 75 L24 48"/>'+ST+'x="50" y="76" width="22" height="5" rx="2"/><path class="rail" d="M62 87 L142 25"/>',
+      a:{hip:[58,70],T:222,arm:{hand:[60,68],b:1},leg:{foot:[91,50.4],b:-1},ft:-105},
+      b:{hip:[58,70],T:222,arm:{hand:[60,68],b:1},leg:{foot:[91,50.4],b:-1},ft:-160}},
+    curlcable:{label:'Curl à la poulie basse',v:'s',
+      cab:[128,86],imp:[{on:'hand',r:2.8}],
+      a:{hip:[80,49],T:-90,arm:{ua:92,fa:88},leg:{foot:[80,87],b:-1}},
+      b:{hip:[80,49],T:-90,arm:{ua:95,fa:-55},leg:{foot:[80,87],b:-1}}},
     pullover:{label:'Pull-over à la poulie',v:'s',
       cab:[112,4],imp:[{on:'hand',r:2.8}],
       a:{hip:[76,50],T:-84,arm:{ua:-52,fa:-55},leg:{foot:[78,87],b:-1}},
@@ -639,7 +652,7 @@ var Fig=(function(){
       for(var i=0;i<n;i++){
         var gg=el('g',{'class':'imp'},self.dyn);
         el('circle',{'class':'plate',r:im.r},gg);el('circle',{'class':'hub',r:Math.max(1,im.r*0.32)},gg);
-        self.impEls.push({g:gg,on:im.on,i:i});
+        self.impEls.push({g:gg,on:im.on,i:i,dx:im.dx,dy:im.dy});
       }
     });
     if(sc.plat){this.platEl=el('line',{'class':'plat'},this.back)}
@@ -671,7 +684,7 @@ var Fig=(function(){
     });
     this.impEls.forEach(function(ie){
       var q=ie.on==='ankle'?j.leg.A:hands[Math.min(ie.i,hands.length-1)];
-      if(ie.on==='ankle')q=[q[0]+1.5,q[1]-3.2];
+      if(ie.on==='ankle')q=[q[0]+(ie.dx===undefined?1.5:ie.dx),q[1]+(ie.dy===undefined?-3.2:ie.dy)];
       ie.g.setAttribute('transform','translate('+q[0].toFixed(2)+' '+q[1].toFixed(2)+')');
     });
     if(this.platEl){
@@ -763,6 +776,9 @@ var Muscles=(function(){
     hipthrust:{p:['glutes'],s:['hams','adduct']},
     squat:{p:['quads','glutes'],s:['adduct','abs','lowback']},
     pullover:{p:['lats'],s:['chest','triceps','abs']},
+    curlcable:{p:['biceps'],s:['forearm']},
+    calfseat:{p:['calves'],s:[]},
+    calfpress:{p:['calves'],s:[]},
     crunch:{p:['abs'],s:['obl']},
     revcrunch:{p:['abs'],s:['obl','adduct']},
     deadbug:{p:['abs'],s:['obl','quads']},
@@ -854,7 +870,7 @@ var Muscles=(function(){
 <script>
 (function(){
   'use strict';
-  var VERSION='1.1';
+  var VERSION='1.2';
 
 /* ================= Programme ================= */
   var DAYS_A=[
@@ -866,7 +882,7 @@ var Muscles=(function(){
       {id:'mer-triceps',n:'Extension triceps overhead poulie',s:3,r:'10-12',rest:'1,5 min',sec:90,i:'triceps',cue:'Coudes fixes, étire bien en bas, tends complètement en haut.',q:'extension triceps overhead poulie technique'}
     ]},
     {key:'jeu',dow:4,name:'Jeudi',tag:'Pull',c:'pull',sub:'Dos, biceps, arrière d\'épaules',ex:[
-      {id:'jeu-tirage',n:'Tirage vertical prise neutre',s:4,r:'6-10',rest:'2-3 min',sec:150,i:'pulldown',cue:'Tire les coudes vers les côtes, poitrine sortie, sans balancer le buste.',q:'tirage vertical prise neutre technique'},
+      {id:'jeu-tirage',n:'Tirage vertical prise neutre',s:4,r:'6-10',rest:'2-3 min',sec:150,i:'pulldown',cue:'Tire les coudes vers les côtes, poitrine sortie, sans balancer le buste. Pas de poignée neutre sur ta poulie : prise mi-large en supination.',q:'tirage vertical prise neutre technique'},
       {id:'jeu-rowing',n:'Rowing machine ou poulie, buste incliné',s:3,r:'8-10',rest:'2 min',sec:120,i:'row',cue:'Serre les omoplates en fin de mouvement, courte pause.',q:'rowing machine dos technique'},
       {id:'jeu-horiz',n:'Tirage horizontal poulie, prise neutre',s:3,r:'10-12',rest:'2 min',sec:120,i:'row',cue:'Buste stable, étire le dos à l\'aller, tire vers le bas du ventre.',q:'tirage horizontal poulie prise neutre technique'},
       {id:'jeu-face',n:'Face pull',s:3,r:'15-20',rest:'1 min',sec:60,i:'facepull',cue:'Charge légère. Tire vers le visage, coudes hauts, rotation externe en fin.',q:'face pull poulie technique'},
@@ -875,26 +891,26 @@ var Muscles=(function(){
     ]},
     {key:'ven',dow:5,name:'Vendredi',tag:'Legs',c:'legs',sub:'Quadriceps, ischios, mollets',ex:[
       {id:'ven-presse',n:'Presse à cuisses (pieds milieu / bas)',s:4,r:'8-12',rest:'2-3 min',sec:150,i:'legpress',cue:'Descends sans décoller le bassin du siège. Ne verrouille pas les genoux.',q:'presse à cuisses technique'},
-      {id:'ven-rdl',n:'Soulevé de terre roumain haltères',s:3,r:'8-10',rest:'2-3 min',sec:150,i:'hinge',cue:'Bassin vers l\'arrière, dos plat, haltères près des jambes, genoux légèrement fléchis.',q:'soulevé de terre roumain haltères technique'},
-      {id:'ven-legcurl',n:'Leg curl',s:3,r:'10-15',rest:'1,5-2 min',sec:105,i:'legcurl',cue:'Montée en 1 s, descente en 3 s. Bassin plaqué.',q:'leg curl technique ischios'},
+      {id:'ven-rdl',n:'Soulevé de terre roumain, barre (ou haltères)',s:3,r:'8-10',rest:'2-3 min',sec:150,i:'hinge',cue:'Barre décrochée du rack à hauteur des hanches (ou 2 haltères, 40 kg maximum chacun). Bassin vers l\'arrière, dos plat, la barre longe les jambes, genoux légèrement fléchis.',q:'soulevé de terre roumain barre technique'},
+      {id:'ven-legcurl',n:'Leg curl assis, charge lourde',s:3,r:'8-12',rest:'1,5-2 min',sec:105,i:'legcurl',cue:'La version assise étire les ischios : c\'est la plus efficace pour les faire grossir. Dos calé, coussin sur les cuisses, rouleau sur le bas des mollets. Montée en 1 s, descente en 3 s, amplitude complète.',q:'leg curl assis technique ischios'},
       {id:'ven-legext',n:'Leg extension',s:3,r:'12-15',rest:'1,5 min',sec:90,i:'legext',cue:'Contracte une seconde en haut, descente lente.',q:'leg extension technique'},
-      {id:'ven-mollets',n:'Mollets (presse ou debout)',s:4,r:'8-12',rest:'1,5-2 min',sec:105,i:'calf',cue:'Amplitude complète, pause en bas et en haut.',q:'mollets debout technique'}
+      {id:'ven-mollets',n:'Mollets à la presse (jambes tendues)',s:4,r:'8-12',rest:'1,5-2 min',sec:105,i:'calfpress',cue:'Jambes presque tendues, la pointe des pieds en bas de la plateforme. Amplitude complète, pause d\'une seconde en bas (étirement) et en haut.',q:'mollets à la presse technique'}
     ]},
     {key:'sam',dow:6,name:'Samedi',tag:'Upper',c:'upper',sub:'Haut du corps, volume',warm:true,ex:[
-      {id:'sam-incline',n:'Développé incliné léger (autre machine ou angle)',s:3,r:'10-12',rest:'2 min',sec:120,i:'press_incline',cue:'Plus léger que mercredi, 1-2 reps de marge.',q:'développé incliné machine technique'},
+      {id:'sam-incline',n:'Développé incliné à la machine (Chest incliné)',s:3,r:'10-12',rest:'2 min',sec:120,i:'press_incline',cue:'Plus léger que mercredi, 1-2 reps de marge. Règle le siège pour que les poignées partent à hauteur du haut de la poitrine.',q:'développé incliné machine technique'},
       {id:'sam-tirage',n:'Tirage vertical, autre prise',s:3,r:'8-12',rest:'2 min',sec:120,i:'pulldown',cue:'Change de prise par rapport à jeudi (supination ou large).',q:'tirage vertical supination technique'},
       {id:'sam-ecartes',n:'Écartés à la poulie',s:3,r:'12-15',rest:'1,5 min',sec:90,i:'fly',cue:'Amplitude confortable, la tension reste sur la poitrine.',q:'écartés poulie technique'},
       {id:'sam-rowing',n:'Rowing poitrine appuyée ou unilatéral',s:3,r:'10-12',rest:'2 min',sec:120,i:'row',cue:'Appuie la poitrine, tire avec le dos plutôt qu\'avec les bras.',q:'rowing poitrine appuyée technique'},
       {id:'sam-lateral',n:'Élévations latérales',s:3,r:'15-20',rest:'1 min',sec:60,i:'lateral',cue:'Légères, propres, jusqu\'à l\'horizontale.',q:'élévations latérales haltères technique'},
-      {id:'sam-pupitre',n:'Curl pupitre',s:3,r:'10-15',rest:'1,5 min',sec:90,i:'curl',cue:'Descente lente, ne verrouille pas le coude en bas.',q:'curl pupitre technique'},
+      {id:'sam-curlpoulie',n:'Curl à la poulie basse',s:3,r:'10-15',rest:'1,5 min',sec:90,i:'curlcable',cue:'Coudes collés au buste, tension continue grâce à la poulie. Descente lente, ne verrouille pas le coude en bas.',q:'curl poulie basse technique'},
       {id:'sam-triceps',n:'Triceps barre au front ou corde',s:3,r:'10-15',rest:'1,5 min',sec:90,i:'triceps',cue:'Coudes fixes, charge modérée.',q:'extension triceps technique'}
     ]},
     {key:'dim',dow:0,name:'Dimanche',tag:'Lower',c:'lower',sub:'Jambes, fessiers',ex:[
       {id:'dim-presse',n:'Presse (pieds hauts et écartés)',s:3,r:'10-12',rest:'2 min',sec:120,i:'legpress',cue:'Pieds hauts et larges pour solliciter ischios et fessiers.',q:'presse à cuisses pieds hauts fessiers'},
       {id:'dim-bulgares',n:'Fentes bulgares haltères',s:3,r:'8-10 / jambe',rest:'2 min',sec:120,i:'lunge',cue:'Buste légèrement penché, genou avant au-dessus du pied.',q:'fentes bulgares haltères technique'},
-      {id:'dim-hip',n:'Hip thrust',s:3,r:'8-12',rest:'2 min',sec:120,i:'hipthrust',cue:'Menton rentré, pousse sur les talons, contracte les fessiers en haut.',q:'hip thrust technique'},
-      {id:'dim-legcurl',n:'Leg curl (autre variante si possible)',s:3,r:'10-15',rest:'1,5-2 min',sec:105,i:'legcurl',cue:'Contrôle la descente.',q:'leg curl assis ou allongé technique'},
-      {id:'dim-mollets',n:'Mollets assis',s:4,r:'12-15',rest:'1,5 min',sec:90,i:'calf',cue:'Pause en bas, amplitude complète.',q:'mollets assis technique'}
+      {id:'dim-hip',n:'Hip thrust (barre ou haltère sur le bassin)',s:3,r:'8-12',rest:'2 min',sec:120,i:'hipthrust',cue:'Haut du dos appuyé sur un banc, barre avec mousse ou haltère de 40 kg sur le bassin. Menton rentré, pousse sur les talons, contracte les fessiers en haut.',q:'hip thrust technique'},
+      {id:'dim-legcurl',n:'Leg curl assis, plus léger',s:3,r:'12-15',rest:'1,5-2 min',sec:105,i:'legcurl',cue:'Même machine que vendredi : charge plus légère, séries plus longues. Descente en 3 s, sans rebondir en bas.',q:'leg curl assis technique ischios'},
+      {id:'dim-mollets',n:'Mollets assis, haltères sur les genoux',s:4,r:'12-15',rest:'1,5 min',sec:90,i:'calfseat',cue:'Assis sur un banc, un haltère de 40 kg sur chaque cuisse près des genoux, pointe des pieds sur un disque. Pause en bas, amplitude complète : la jambe fléchie travaille le soléaire.',q:'mollets assis haltères banc technique'}
     ]}
   ];
   var DAYS_B=[
@@ -910,17 +926,17 @@ var Muscles=(function(){
       {id:'b-jeu-tirage',n:'Tirage vertical prise supination',s:4,r:'6-10',rest:'2-3 min',sec:150,i:'pulldown',cue:'Paumes vers toi, largeur d\'épaules : plus de biceps. Tire vers le haut de la poitrine.',q:'tirage vertical supination technique'},
       {id:'b-jeu-rowing',n:'Rowing haltère unilatéral (banc)',s:3,r:'8-12',rest:'2 min',sec:120,i:'row',cue:'Une main sur le banc, tire le coude vers la hanche, grande amplitude.',q:'rowing haltère unilatéral technique'},
       {id:'b-jeu-pullover',n:'Pull-over à la poulie, bras tendus',s:3,r:'12-15',rest:'1,5 min',sec:90,i:'pullover',cue:'Bras presque tendus, tire vers les cuisses, dos plat. Sens les grands dorsaux.',q:'pull-over poulie haute technique'},
-      {id:'b-jeu-oiseau',n:'Oiseau (arrière d\'épaules), machine ou haltères',s:3,r:'15-20',rest:'1 min',sec:60,i:'facepull',cue:'Charge légère, ouvre les bras sans hausser les épaules.',q:'oiseau arrière épaule machine technique'},
-      {id:'b-jeu-pupitre',alias:'sam-pupitre',n:'Curl pupitre',s:3,r:'8-12',rest:'1,5 min',sec:90,i:'curl',cue:'Descente lente, ne verrouille pas le coude en bas.',q:'curl pupitre technique'},
+      {id:'b-jeu-oiseau',n:'Oiseau (arrière d\'épaules), machine ou haltères',s:3,r:'15-20',rest:'1 min',sec:60,i:'facepull',cue:'Charge légère, ouvre les bras sans hausser les épaules. Haltères, buste penché sur un banc incliné, si ta machine pectorale ne se règle pas en oiseau.',q:'oiseau arrière épaule machine technique'},
+      {id:'b-jeu-curl',n:'Curl haltères debout, supination',s:3,r:'8-12',rest:'1,5 min',sec:90,i:'curl',cue:'Tourne la paume vers le haut en montant, coudes collés, descente lente. Pas d\'élan.',q:'curl haltères supination technique'},
       {id:'b-jeu-marteau',n:'Curl marteau à la corde (poulie)',s:3,r:'10-12',rest:'1,5 min',sec:90,i:'curl',cue:'Tension continue grâce à la poulie, coudes collés.',q:'curl marteau corde poulie technique'}
     ]},
     {key:'ven',dow:5,name:'Vendredi',tag:'Legs',c:'legs',sub:'Ischios en premier, quadriceps, mollets',ex:[
-      {id:'b-ven-rdl',alias:'ven-rdl',n:'Soulevé de terre roumain haltères',s:4,r:'6-10',rest:'2-3 min',sec:150,i:'hinge',cue:'Cette fois il ouvre la séance : charge lourde, dos plat, haltères près des jambes.',q:'soulevé de terre roumain haltères technique'},
+      {id:'b-ven-rdl',alias:'ven-rdl',n:'Soulevé de terre roumain, barre (ou haltères)',s:4,r:'6-10',rest:'2-3 min',sec:150,i:'hinge',cue:'Cette fois il ouvre la séance : charge lourde, dos plat, la barre longe les jambes. Au-delà de 2 × 40 kg, prends la barre.',q:'soulevé de terre roumain barre technique'},
       {id:'b-ven-presse',alias:'ven-presse',n:'Presse à cuisses (pieds bas)',s:3,r:'10-15',rest:'2 min',sec:120,i:'legpress',cue:'Pieds bas et rapprochés pour insister sur les quadriceps.',q:'presse à cuisses pieds bas quadriceps'},
-      {id:'b-ven-legcurl',alias:'ven-legcurl',n:'Leg curl',s:3,r:'8-12',rest:'1,5-2 min',sec:105,i:'legcurl',cue:'Un peu plus lourd que dans le programme A.',q:'leg curl technique ischios'},
+      {id:'b-ven-legcurl',alias:'ven-legcurl',n:'Leg curl assis, charge lourde',s:3,r:'8-12',rest:'1,5-2 min',sec:105,i:'legcurl',cue:'Dos calé, coussin sur les cuisses. Montée en 1 s, descente en 3 s, amplitude complète.',q:'leg curl assis technique ischios'},
       {id:'b-ven-fentes',n:'Fentes marchées haltères',s:3,r:'8-12 / jambe',rest:'2 min',sec:120,i:'lunge',cue:'Pas longs, buste droit, genou avant au-dessus du pied.',q:'fentes marchées haltères technique'},
       {id:'b-ven-legext',alias:'ven-legext',n:'Leg extension',s:3,r:'12-20',rest:'1,5 min',sec:90,i:'legext',cue:'Contracte une seconde en haut, descente lente.',q:'leg extension technique'},
-      {id:'b-ven-mollets',alias:'ven-mollets',n:'Mollets (presse)',s:4,r:'10-15',rest:'1,5 min',sec:90,i:'calf',cue:'Amplitude complète, pause en bas et en haut.',q:'mollets à la presse technique'}
+      {id:'b-ven-mollets',alias:'ven-mollets',n:'Mollets à la presse (jambes tendues)',s:4,r:'10-15',rest:'1,5 min',sec:90,i:'calfpress',cue:'Jambes presque tendues, la pointe des pieds en bas de la plateforme. Amplitude complète, pause en bas et en haut.',q:'mollets à la presse technique'}
     ]},
     {key:'sam',dow:6,name:'Samedi',tag:'Upper',c:'upper',sub:'Haut du corps, volume',warm:true,ex:[
       {id:'b-sam-couche',n:'Développé couché haltères, prise neutre',s:3,r:'8-12',rest:'2 min',sec:120,i:'press_flat',cue:'Les haltères laissent plus de liberté à l\'épaule que la barre.',q:'développé couché haltères prise neutre technique'},
@@ -933,10 +949,10 @@ var Muscles=(function(){
     ]},
     {key:'dim',dow:0,name:'Dimanche',tag:'Lower',c:'lower',sub:'Squat gobelet, fessiers, ischios',ex:[
       {id:'b-dim-goblet',n:'Squat gobelet (haltère contre la poitrine)',s:3,r:'10-15',rest:'2 min',sec:120,i:'squat',cue:'Pour apprendre le squat avec peu de charge : talons au sol, genoux dans l\'axe des pieds, descends à la parallèle.',q:'squat gobelet technique'},
-      {id:'b-dim-hip',alias:'dim-hip',n:'Hip thrust',s:3,r:'8-12',rest:'2 min',sec:120,i:'hipthrust',cue:'Menton rentré, pousse sur les talons, contracte les fessiers en haut.',q:'hip thrust technique'},
+      {id:'b-dim-hip',alias:'dim-hip',n:'Hip thrust (barre ou haltère sur le bassin)',s:3,r:'8-12',rest:'2 min',sec:120,i:'hipthrust',cue:'Haut du dos appuyé sur un banc, barre avec mousse ou haltère de 40 kg sur le bassin. Menton rentré, pousse sur les talons, contracte les fessiers en haut.',q:'hip thrust technique'},
       {id:'b-dim-fentes',n:'Fentes arrière haltères',s:3,r:'8-12 / jambe',rest:'2 min',sec:120,i:'lunge',cue:'Recule d\'un grand pas, buste droit : plus doux pour les genoux que les fentes avant.',q:'fentes arrière haltères technique'},
-      {id:'b-dim-legcurl',alias:'dim-legcurl',n:'Leg curl allongé',s:3,r:'10-15',rest:'1,5-2 min',sec:105,i:'legcurl',cue:'Contrôle la descente.',q:'leg curl allongé technique'},
-      {id:'b-dim-mollets',alias:'dim-mollets',n:'Mollets assis',s:4,r:'12-20',rest:'1,5 min',sec:90,i:'calf',cue:'Pause en bas, amplitude complète.',q:'mollets assis technique'}
+      {id:'b-dim-legcurl',alias:'dim-legcurl',n:'Leg curl assis, plus léger',s:3,r:'12-15',rest:'1,5-2 min',sec:105,i:'legcurl',cue:'Même machine que vendredi : charge plus légère, séries plus longues. Descente en 3 s.',q:'leg curl assis technique ischios'},
+      {id:'b-dim-mollets',alias:'dim-mollets',n:'Mollets assis, haltères sur les genoux',s:4,r:'12-20',rest:'1,5 min',sec:90,i:'calfseat',cue:'Assis sur un banc, un haltère de 40 kg sur chaque cuisse près des genoux, pointe des pieds sur un disque. Pause en bas, amplitude complète.',q:'mollets assis haltères banc technique'}
     ]}
   ];
   /* Lundi (abdos à la maison) et mardi (repos) : identiques dans les deux programmes, l'historique est donc partagé. */
@@ -2275,7 +2291,7 @@ var Muscles=(function(){
   rerender();
   if(meta.wake)reqWake();
   /* petit accès pour les tests automatiques */
-  window.__ppl={S:function(){return S},meta:function(){return meta},parseImport:parseImport,applyImport:applyImport,recapData:recapData,history:history,prInfo:prInfo,persist:persist,go:go};
+  window.__ppl={exmap:EXMAP,progs:PROGS,S:function(){return S},meta:function(){return meta},parseImport:parseImport,applyImport:applyImport,recapData:recapData,history:history,prInfo:prInfo,persist:persist,go:go};
 })();
 
 </script>
