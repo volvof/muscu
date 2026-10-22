@@ -18,7 +18,7 @@
 
 :root{
   --bg:#F1F4F8; --surface:#FFFFFF; --ink:#0F1B2D; --muted:#5B6878; --line:#D8DFE8; --prop:#B4BFCD; --on-c:#FFFFFF;
-  --push:#D6334C; --pull:#2457E6; --legs:#13875C; --upper:#7142D6; --lower:#B87500; --abs:#0A7F96; --rest:#5E6B7E; --good:#13875C; --bad:#C23B2E;
+  --push:#D6334C; --pull:#2457E6; --legs:#13875C; --upper:#7142D6; --lower:#B87500; --abs:#0A7F96; --rest:#5E6B7E; --good:#13875C; --bad:#C23B2E; --on-good:#FFFFFF; --on-bad:#FFFFFF;
   --nav-h:58px; --done-t:#7CF0B8;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
@@ -27,12 +27,12 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0C1320; --surface:#152033; --ink:#EAF0F8; --muted:#9AA9BC; --line:#25324A; --prop:#3B4C69; --on-c:#0C1320;
-    --push:#FF6B80; --pull:#7FA2FF; --legs:#3DD6A0; --upper:#B197FF; --lower:#F0B03A; --abs:#4CCBE3; --rest:#A8B3C6; --good:#3DD6A0; --bad:#FF8A7D; --done-t:#0E7A52;
+    --push:#FF6B80; --pull:#7FA2FF; --legs:#3DD6A0; --upper:#B197FF; --lower:#F0B03A; --abs:#4CCBE3; --rest:#A8B3C6; --good:#3DD6A0; --bad:#FF8A7D; --on-good:#06281C; --on-bad:#3A0D07; --done-t:#0E7A52;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0C1320; --surface:#152033; --ink:#EAF0F8; --muted:#9AA9BC; --line:#25324A; --prop:#3B4C69; --on-c:#0C1320;
-  --push:#FF6B80; --pull:#7FA2FF; --legs:#3DD6A0; --upper:#B197FF; --lower:#F0B03A; --abs:#4CCBE3; --rest:#A8B3C6; --good:#3DD6A0; --bad:#FF8A7D; --done-t:#0E7A52;
+  --push:#FF6B80; --pull:#7FA2FF; --legs:#3DD6A0; --upper:#B197FF; --lower:#F0B03A; --abs:#4CCBE3; --rest:#A8B3C6; --good:#3DD6A0; --bad:#FF8A7D; --on-good:#06281C; --on-bad:#3A0D07; --done-t:#0E7A52;
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 *,*::before,*::after{box-sizing:inherit}
@@ -129,8 +129,9 @@ details.warm li{margin:3px 0}
   font:inherit;font-size:1.1rem;font-weight:700;padding:0 10px;text-align:right;
 }
 .sprev{flex:1;min-width:0;color:var(--muted);font-size:.85rem}
-.sdel{min-width:34px;text-align:right;font-weight:700;font-size:.95rem}
-.sdel.up{color:var(--good)} .sdel.down{color:var(--bad)} .sdel.eq{color:var(--muted)}
+.sdel{min-width:44px;text-align:center;font-weight:800;font-size:1rem;padding:3px 9px;border-radius:999px;line-height:1.3}
+.sdel:empty{padding:0;min-width:44px}
+.sdel.up{background:var(--good);color:var(--on-good)} .sdel.down{background:var(--bad);color:var(--on-bad)} .sdel.eq{color:var(--muted);font-weight:700}
 .addset{margin-top:10px}
 .legacy{margin:8px 0 0;color:var(--muted);font-size:.85rem}
 .notes{margin-top:12px;border-top:1px solid var(--line);padding-top:6px}
@@ -166,8 +167,24 @@ details.warm li{margin:3px 0}
   width:92px;height:46px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);
   font:inherit;font-size:1.1rem;font-weight:700;padding:0 10px;text-align:right;
 }
-.delta{min-height:1.3em;margin:8px 0 0;font-size:.9rem;font-weight:700}
-.delta.up{color:var(--good)} .delta.down{color:var(--bad)} .delta.eq{color:var(--muted)}
+.delta{display:flex;align-items:center;gap:10px;margin:12px 0 0;padding:11px 14px;border-radius:12px;font-size:1.05rem;font-weight:800;line-height:1.25;border:1.5px solid var(--line)}
+.delta:empty{display:none}
+.delta::before{flex:0 0 auto;font-size:1.05rem}
+.delta.up{background:color-mix(in srgb,var(--good) 16%,var(--surface));border-color:color-mix(in srgb,var(--good) 55%,var(--line));color:color-mix(in srgb,var(--good) 78%,var(--ink))}
+.delta.up::before{content:'▲'}
+.delta.down{background:color-mix(in srgb,var(--bad) 14%,var(--surface));border-color:color-mix(in srgb,var(--bad) 55%,var(--line));color:color-mix(in srgb,var(--bad) 80%,var(--ink))}
+.delta.down::before{content:'▼'}
+.delta.eq{background:color-mix(in srgb,var(--ink) 5%,var(--surface));color:var(--muted);font-weight:700}
+.delta.eq::before{content:'='}
+.stepnote{display:block;margin-top:4px;color:var(--muted);font-size:.85rem}
+/* pastille de progrès posée sur l'image de l'exercice */
+.pdl{position:absolute;left:10px;bottom:10px;height:30px;padding:0 12px;border-radius:15px;display:flex;align-items:center;font-weight:800;font-size:.92rem;letter-spacing:.01em;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.pdl[hidden]{display:none}
+.pdl.up{background:var(--good);color:var(--on-good)} .pdl.down{background:var(--bad);color:var(--on-bad)}
+.pdl.eq{background:var(--surface);color:var(--muted);border:1.5px solid var(--line);box-shadow:none}
+/* la carte entière prend la couleur du résultat */
+.ex.up{border-color:color-mix(in srgb,var(--good) 65%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--good) 65%,var(--line))}
+.ex.down{border-color:color-mix(in srgb,var(--bad) 55%,var(--line))}
 .yt{display:inline-flex;align-items:center;min-height:44px;padding:0 4px;color:var(--c);font-weight:700;text-decoration:none;font-size:.92rem}
 .yt:hover{text-decoration:underline}
 .tools{display:flex;justify-content:center;margin-top:6px}
@@ -394,6 +411,29 @@ textarea{display:block;width:100%;border-radius:10px;border:2px solid var(--line
 .nextup b{display:block}
 .nextup span{color:var(--muted);font-size:.9rem}
 
+/* ---------- « Machine prise ? » : remplacement d'un exercice ---------- */
+.acts{display:flex;flex-direction:column;align-items:flex-end;gap:0}
+.sw{min-height:44px;padding:0 4px;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:.92rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.swlist{margin:10px 0 0;padding:10px;border:1.5px dashed color-mix(in srgb,var(--c) 55%,var(--line));border-radius:12px;background:color-mix(in srgb,var(--c) 5%,var(--surface))}
+.swlist[hidden]{display:none}
+.swh{margin:0 0 8px;color:var(--muted);font-size:.85rem}
+.swopt{display:block;width:100%;text-align:left;margin-top:6px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;min-height:48px}
+.swopt b{display:block;font-size:.98rem}
+.swopt small{display:block;color:var(--muted);font-size:.82rem}
+.swopt:focus-visible,.sw:focus-visible,.swundo:focus-visible{outline:3px solid var(--c,var(--pull));outline-offset:2px}
+.subbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 8px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--c) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 40%,var(--line));font-size:.88rem}
+.subbar b{color:var(--c)}
+.swundo{min-height:40px;padding:0 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-weight:700;font-size:.85rem;cursor:pointer}
+.subnote{margin:8px 0 0;padding:8px 10px;border-radius:10px;border-left:4px solid var(--c);background:color-mix(in srgb,var(--c) 7%,var(--surface));font-size:.88rem;color:var(--muted)}
+.ex.sub{border-style:dashed}
+.rfor{display:block;color:var(--c);font-weight:600}
+.rplist{list-style:none;margin:6px 0 0;padding:0}
+.rplist li{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+.rplist li b{min-width:64px}
+.rplist li span{color:var(--muted)}
+
+.swundo[hidden]{display:none}
+
 </style>
 </head>
 <body>
@@ -488,6 +528,11 @@ var Fig=(function(){
     var a2=ik(SL,mirrorX(p.arm.hand),LEN.ua,LEN.fa,-(p.arm.b||1));
     j.arm2={E:a2.E,W:a2.P};
     var fy=87;
+    if(p.seat){ /* assis : les cuisses viennent vers le spectateur, on ne voit que les genoux écartés puis les tibias */
+      j.leg={K:[HR[0]+p.seat.kx,H[1]+p.seat.ky],A:[cx+fs,fy],toe:[cx+fs+5,fy+1.5],heel:[cx+fs-1,fy+1.5]};
+      j.leg2={K:[HL[0]-p.seat.kx,H[1]+p.seat.ky],A:[cx-fs,fy],toe:[cx-fs-5,fy+1.5],heel:[cx-fs+1,fy+1.5]};
+      return j;
+    }
     var l=ik(HR,[cx+fs,fy],LEN.th,LEN.sh,-1);
     j.leg={K:l.E,A:l.P,toe:[cx+fs+5,fy+1.5],heel:[cx+fs-1,fy+1.5]};
     var l2=ik(HL,[cx-fs,fy],LEN.th,LEN.sh,1);
@@ -526,6 +571,13 @@ var Fig=(function(){
       cab:[[44,4],[116,4]],imp:[{on:'hand',r:2.8}],
       a:{hy:48.5,arm:{hand:[111,32],b:-1},leg:{fs:5.5}},
       b:{hy:48.5,arm:{hand:[84,37],b:-1},leg:{fs:5.5}}},
+    pecdeck:{label:'Pec fly à la machine',v:'f',
+      prop:'<rect class="pp" x="136" y="22" width="12" height="66" rx="2"/><rect class="pp" x="136" y="40" width="12" height="2"/><rect class="pp" x="136" y="52" width="12" height="2"/>'
+        +'<rect class="pp" x="70" y="30" width="20" height="38" rx="6"/><rect class="pp" x="66" y="66" width="28" height="5" rx="2.5"/>'
+        +'<rect class="pp" x="78" y="71" width="4" height="17"/><rect class="pp" x="62" y="86" width="36" height="3" rx="1.5"/>',
+      imp:[{on:'hand',r:3.4}],
+      a:{hy:62,seat:{kx:5,ky:6},arm:{hand:[112,42],b:-1},leg:{fs:11}},
+      b:{hy:62,seat:{kx:5,ky:6},arm:{hand:[86,50],b:-1},leg:{fs:11}}},
     pulldown:{label:'Tirage vertical',v:'s',
       prop:ST+'x="64" y="71" width="38" height="5" rx="2"/>'+ST+'x="68" y="76" width="4" height="14"/>'+ST+'x="94" y="76" width="4" height="14"/><circle class="pp" cx="95" cy="62" r="4"/>',
       cab:[88,0],imp:[{on:'hand',r:2.6}],
@@ -763,6 +815,7 @@ var Muscles=(function(){
     lateral:{p:['delt_s'],s:['traps']},
     triceps:{p:['triceps'],s:[]},
     fly:{p:['chest'],s:['delt_f']},
+    pecdeck:{p:['chest'],s:['delt_f']},
     pulldown:{p:['lats'],s:['biceps','delt_r','forearm']},
     row:{p:['lats','traps'],s:['delt_r','biceps','lowback']},
     facepull:{p:['delt_r'],s:['traps','delt_s']},
@@ -790,8 +843,7 @@ var Muscles=(function(){
     'jeu-marteau':{p:['biceps','forearm'],s:[]},
     'b-jeu-marteau':{p:['biceps','forearm'],s:[]},
     'b-jeu-oiseau':{p:['delt_r'],s:['traps']},
-    'jeu-horiz':{p:['lats','traps'],s:['delt_r','biceps']},
-    'sam-ecartes':{p:['chest'],s:['delt_f']}
+    'jeu-horiz':{p:['lats','traps'],s:['delt_r','biceps']}
   };
   function of(ex){
     var o=(ex&&OVR[ex.id])||BY_ICON[ex&&ex.i]||{p:[],s:[]};
@@ -870,12 +922,12 @@ var Muscles=(function(){
 <script>
 (function(){
   'use strict';
-  var VERSION='1.2';
+  var VERSION='1.4';
 
 /* ================= Programme ================= */
   var DAYS_A=[
     {key:'mer',dow:3,name:'Mercredi',tag:'Push',c:'push',sub:'Pectoraux, épaules, triceps',warm:true,ex:[
-      {id:'mer-couche',n:'Développé couché machine ou haltères',s:4,r:'6-10',rest:'2-3 min',sec:150,i:'press_flat',cue:'Prise neutre si possible. Coudes à 45-60° du buste, omoplates serrées, descente contrôlée.',q:'développé couché prise neutre haltères technique'},
+      {id:'mer-couche',n:'Développé couché à la machine (chest press)',s:4,r:'6-10',rest:'2-3 min',sec:150,i:'press_flat',cue:'Dos plaqué, omoplates serrées, poignées à hauteur de poitrine, prise neutre si la machine en a. Coudes à 45-60° du buste, descente contrôlée. Machine occupée : le bouton « Machine prise ? » te fait passer aux haltères sans fausser ton historique.',q:'développé couché machine technique'},
       {id:'mer-incline',n:'Développé incliné haltères (15-30°)',s:3,r:'8-12',rest:'2 min',sec:120,i:'press_incline',cue:'Banc peu incliné, prise neutre, amplitude confortable pour l\'épaule.',q:'développé incliné haltères 30 degrés technique'},
       {id:'mer-epaules',n:'Développé épaules haltères assis',s:3,r:'8-10',rest:'2 min',sec:120,i:'press_overhead',cue:'Prise neutre, banc à 80-85°. Monte la charge progressivement.',q:'développé épaules haltères prise neutre technique'},
       {id:'mer-lateral',n:'Élévations latérales à la poulie',s:4,r:'12-20',rest:'1-1,5 min',sec:75,i:'lateral',cue:'Priorité du jour pour les épaules. Jusqu\'à l\'horizontale, sans élan.',q:'élévations latérales poulie technique'},
@@ -883,7 +935,7 @@ var Muscles=(function(){
     ]},
     {key:'jeu',dow:4,name:'Jeudi',tag:'Pull',c:'pull',sub:'Dos, biceps, arrière d\'épaules',ex:[
       {id:'jeu-tirage',n:'Tirage vertical prise neutre',s:4,r:'6-10',rest:'2-3 min',sec:150,i:'pulldown',cue:'Tire les coudes vers les côtes, poitrine sortie, sans balancer le buste. Pas de poignée neutre sur ta poulie : prise mi-large en supination.',q:'tirage vertical prise neutre technique'},
-      {id:'jeu-rowing',n:'Rowing machine ou poulie, buste incliné',s:3,r:'8-10',rest:'2 min',sec:120,i:'row',cue:'Serre les omoplates en fin de mouvement, courte pause.',q:'rowing machine dos technique'},
+      {id:'jeu-rowing',n:'Rowing à la poulie, buste incliné',s:3,r:'8-10',rest:'2 min',sec:120,i:'row',cue:'Serre les omoplates en fin de mouvement, courte pause.',q:'rowing poulie buste incliné technique'},
       {id:'jeu-horiz',n:'Tirage horizontal poulie, prise neutre',s:3,r:'10-12',rest:'2 min',sec:120,i:'row',cue:'Buste stable, étire le dos à l\'aller, tire vers le bas du ventre.',q:'tirage horizontal poulie prise neutre technique'},
       {id:'jeu-face',n:'Face pull',s:3,r:'15-20',rest:'1 min',sec:60,i:'facepull',cue:'Charge légère. Tire vers le visage, coudes hauts, rotation externe en fin.',q:'face pull poulie technique'},
       {id:'jeu-curlinc',n:'Curl incliné haltères',s:3,r:'10-12',rest:'1,5 min',sec:90,i:'curl',cue:'Banc à 45-60°, bras en arrière du buste : le biceps travaille étiré.',q:'curl incliné haltères technique'},
@@ -891,7 +943,7 @@ var Muscles=(function(){
     ]},
     {key:'ven',dow:5,name:'Vendredi',tag:'Legs',c:'legs',sub:'Quadriceps, ischios, mollets',ex:[
       {id:'ven-presse',n:'Presse à cuisses (pieds milieu / bas)',s:4,r:'8-12',rest:'2-3 min',sec:150,i:'legpress',cue:'Descends sans décoller le bassin du siège. Ne verrouille pas les genoux.',q:'presse à cuisses technique'},
-      {id:'ven-rdl',n:'Soulevé de terre roumain, barre (ou haltères)',s:3,r:'8-10',rest:'2-3 min',sec:150,i:'hinge',cue:'Barre décrochée du rack à hauteur des hanches (ou 2 haltères, 40 kg maximum chacun). Bassin vers l\'arrière, dos plat, la barre longe les jambes, genoux légèrement fléchis.',q:'soulevé de terre roumain barre technique'},
+      {id:'ven-rdl',n:'Soulevé de terre roumain, barre',s:3,r:'8-10',rest:'2-3 min',sec:150,i:'hinge',cue:'Barre décrochée du rack à hauteur des hanches. Bassin vers l\'arrière, dos plat, la barre longe les jambes, genoux légèrement fléchis.',q:'soulevé de terre roumain barre technique'},
       {id:'ven-legcurl',n:'Leg curl assis, charge lourde',s:3,r:'8-12',rest:'1,5-2 min',sec:105,i:'legcurl',cue:'La version assise étire les ischios : c\'est la plus efficace pour les faire grossir. Dos calé, coussin sur les cuisses, rouleau sur le bas des mollets. Montée en 1 s, descente en 3 s, amplitude complète.',q:'leg curl assis technique ischios'},
       {id:'ven-legext',n:'Leg extension',s:3,r:'12-15',rest:'1,5 min',sec:90,i:'legext',cue:'Contracte une seconde en haut, descente lente.',q:'leg extension technique'},
       {id:'ven-mollets',n:'Mollets à la presse (jambes tendues)',s:4,r:'8-12',rest:'1,5-2 min',sec:105,i:'calfpress',cue:'Jambes presque tendues, la pointe des pieds en bas de la plateforme. Amplitude complète, pause d\'une seconde en bas (étirement) et en haut.',q:'mollets à la presse technique'}
@@ -899,16 +951,16 @@ var Muscles=(function(){
     {key:'sam',dow:6,name:'Samedi',tag:'Upper',c:'upper',sub:'Haut du corps, volume',warm:true,ex:[
       {id:'sam-incline',n:'Développé incliné à la machine (Chest incliné)',s:3,r:'10-12',rest:'2 min',sec:120,i:'press_incline',cue:'Plus léger que mercredi, 1-2 reps de marge. Règle le siège pour que les poignées partent à hauteur du haut de la poitrine.',q:'développé incliné machine technique'},
       {id:'sam-tirage',n:'Tirage vertical, autre prise',s:3,r:'8-12',rest:'2 min',sec:120,i:'pulldown',cue:'Change de prise par rapport à jeudi (supination ou large).',q:'tirage vertical supination technique'},
-      {id:'sam-ecartes',n:'Écartés à la poulie',s:3,r:'12-15',rest:'1,5 min',sec:90,i:'fly',cue:'Amplitude confortable, la tension reste sur la poitrine.',q:'écartés poulie technique'},
+      {id:'sam-pecfly',n:'Pec fly à la machine (écartés assis)',s:3,r:'12-15',rest:'1,5 min',sec:90,i:'pecdeck',cue:'Dos plaqué, omoplates serrées vers le bas. Siège réglé pour que les poignées soient à hauteur de poitrine, coudes un peu sous les épaules. Ne laisse pas les coudes passer derrière le plan du dos (utilise la butée de la machine). Fais une série d\'approche légère : c\'est cette machine qui te gênait à froid, ici tu es échauffé.',q:'pec fly machine technique épaule'},
       {id:'sam-rowing',n:'Rowing poitrine appuyée ou unilatéral',s:3,r:'10-12',rest:'2 min',sec:120,i:'row',cue:'Appuie la poitrine, tire avec le dos plutôt qu\'avec les bras.',q:'rowing poitrine appuyée technique'},
       {id:'sam-lateral',n:'Élévations latérales',s:3,r:'15-20',rest:'1 min',sec:60,i:'lateral',cue:'Légères, propres, jusqu\'à l\'horizontale.',q:'élévations latérales haltères technique'},
       {id:'sam-curlpoulie',n:'Curl à la poulie basse',s:3,r:'10-15',rest:'1,5 min',sec:90,i:'curlcable',cue:'Coudes collés au buste, tension continue grâce à la poulie. Descente lente, ne verrouille pas le coude en bas.',q:'curl poulie basse technique'},
-      {id:'sam-triceps',n:'Triceps barre au front ou corde',s:3,r:'10-15',rest:'1,5 min',sec:90,i:'triceps',cue:'Coudes fixes, charge modérée.',q:'extension triceps technique'}
+      {id:'sam-triceps',n:'Triceps à la corde (poulie haute)',s:3,r:'10-15',rest:'1,5 min',sec:90,i:'triceps',cue:'Coudes fixes le long du buste, charge modérée, écarte légèrement la corde en bas.',q:'triceps corde poulie technique'}
     ]},
     {key:'dim',dow:0,name:'Dimanche',tag:'Lower',c:'lower',sub:'Jambes, fessiers',ex:[
       {id:'dim-presse',n:'Presse (pieds hauts et écartés)',s:3,r:'10-12',rest:'2 min',sec:120,i:'legpress',cue:'Pieds hauts et larges pour solliciter ischios et fessiers.',q:'presse à cuisses pieds hauts fessiers'},
       {id:'dim-bulgares',n:'Fentes bulgares haltères',s:3,r:'8-10 / jambe',rest:'2 min',sec:120,i:'lunge',cue:'Buste légèrement penché, genou avant au-dessus du pied.',q:'fentes bulgares haltères technique'},
-      {id:'dim-hip',n:'Hip thrust (barre ou haltère sur le bassin)',s:3,r:'8-12',rest:'2 min',sec:120,i:'hipthrust',cue:'Haut du dos appuyé sur un banc, barre avec mousse ou haltère de 40 kg sur le bassin. Menton rentré, pousse sur les talons, contracte les fessiers en haut.',q:'hip thrust technique'},
+      {id:'dim-hip',n:'Hip thrust, barre sur le bassin',s:3,r:'8-12',rest:'2 min',sec:120,i:'hipthrust',cue:'Haut du dos appuyé sur un banc, barre avec mousse sur le bassin. Menton rentré, pousse sur les talons, contracte les fessiers en haut.',q:'hip thrust technique'},
       {id:'dim-legcurl',n:'Leg curl assis, plus léger',s:3,r:'12-15',rest:'1,5-2 min',sec:105,i:'legcurl',cue:'Même machine que vendredi : charge plus légère, séries plus longues. Descente en 3 s, sans rebondir en bas.',q:'leg curl assis technique ischios'},
       {id:'dim-mollets',n:'Mollets assis, haltères sur les genoux',s:4,r:'12-15',rest:'1,5 min',sec:90,i:'calfseat',cue:'Assis sur un banc, un haltère de 40 kg sur chaque cuisse près des genoux, pointe des pieds sur un disque. Pause en bas, amplitude complète : la jambe fléchie travaille le soléaire.',q:'mollets assis haltères banc technique'}
     ]}
@@ -931,7 +983,7 @@ var Muscles=(function(){
       {id:'b-jeu-marteau',n:'Curl marteau à la corde (poulie)',s:3,r:'10-12',rest:'1,5 min',sec:90,i:'curl',cue:'Tension continue grâce à la poulie, coudes collés.',q:'curl marteau corde poulie technique'}
     ]},
     {key:'ven',dow:5,name:'Vendredi',tag:'Legs',c:'legs',sub:'Ischios en premier, quadriceps, mollets',ex:[
-      {id:'b-ven-rdl',alias:'ven-rdl',n:'Soulevé de terre roumain, barre (ou haltères)',s:4,r:'6-10',rest:'2-3 min',sec:150,i:'hinge',cue:'Cette fois il ouvre la séance : charge lourde, dos plat, la barre longe les jambes. Au-delà de 2 × 40 kg, prends la barre.',q:'soulevé de terre roumain barre technique'},
+      {id:'b-ven-rdl',alias:'ven-rdl',n:'Soulevé de terre roumain, barre',s:4,r:'6-10',rest:'2-3 min',sec:150,i:'hinge',cue:'Cette fois il ouvre la séance : charge lourde, dos plat, la barre longe les jambes.',q:'soulevé de terre roumain barre technique'},
       {id:'b-ven-presse',alias:'ven-presse',n:'Presse à cuisses (pieds bas)',s:3,r:'10-15',rest:'2 min',sec:120,i:'legpress',cue:'Pieds bas et rapprochés pour insister sur les quadriceps.',q:'presse à cuisses pieds bas quadriceps'},
       {id:'b-ven-legcurl',alias:'ven-legcurl',n:'Leg curl assis, charge lourde',s:3,r:'8-12',rest:'1,5-2 min',sec:105,i:'legcurl',cue:'Dos calé, coussin sur les cuisses. Montée en 1 s, descente en 3 s, amplitude complète.',q:'leg curl assis technique ischios'},
       {id:'b-ven-fentes',n:'Fentes marchées haltères',s:3,r:'8-12 / jambe',rest:'2 min',sec:120,i:'lunge',cue:'Pas longs, buste droit, genou avant au-dessus du pied.',q:'fentes marchées haltères technique'},
@@ -949,7 +1001,7 @@ var Muscles=(function(){
     ]},
     {key:'dim',dow:0,name:'Dimanche',tag:'Lower',c:'lower',sub:'Squat gobelet, fessiers, ischios',ex:[
       {id:'b-dim-goblet',n:'Squat gobelet (haltère contre la poitrine)',s:3,r:'10-15',rest:'2 min',sec:120,i:'squat',cue:'Pour apprendre le squat avec peu de charge : talons au sol, genoux dans l\'axe des pieds, descends à la parallèle.',q:'squat gobelet technique'},
-      {id:'b-dim-hip',alias:'dim-hip',n:'Hip thrust (barre ou haltère sur le bassin)',s:3,r:'8-12',rest:'2 min',sec:120,i:'hipthrust',cue:'Haut du dos appuyé sur un banc, barre avec mousse ou haltère de 40 kg sur le bassin. Menton rentré, pousse sur les talons, contracte les fessiers en haut.',q:'hip thrust technique'},
+      {id:'b-dim-hip',alias:'dim-hip',n:'Hip thrust, barre sur le bassin',s:3,r:'8-12',rest:'2 min',sec:120,i:'hipthrust',cue:'Haut du dos appuyé sur un banc, barre avec mousse sur le bassin. Menton rentré, pousse sur les talons, contracte les fessiers en haut.',q:'hip thrust technique'},
       {id:'b-dim-fentes',n:'Fentes arrière haltères',s:3,r:'8-12 / jambe',rest:'2 min',sec:120,i:'lunge',cue:'Recule d\'un grand pas, buste droit : plus doux pour les genoux que les fentes avant.',q:'fentes arrière haltères technique'},
       {id:'b-dim-legcurl',alias:'dim-legcurl',n:'Leg curl assis, plus léger',s:3,r:'12-15',rest:'1,5-2 min',sec:105,i:'legcurl',cue:'Même machine que vendredi : charge plus légère, séries plus longues. Descente en 3 s.',q:'leg curl assis technique ischios'},
       {id:'b-dim-mollets',alias:'dim-mollets',n:'Mollets assis, haltères sur les genoux',s:4,r:'12-20',rest:'1,5 min',sec:90,i:'calfseat',cue:'Assis sur un banc, un haltère de 40 kg sur chaque cuisse près des genoux, pointe des pieds sur un disque. Pause en bas, amplitude complète.',q:'mollets assis haltères banc technique'}
@@ -971,8 +1023,41 @@ var Muscles=(function(){
     B:{label:'B · Variation',note:'Programme B : à lancer après 8 à 12 semaines de A. Mêmes séances, exercices et fourchettes de reps variés. Les exercices identiques gardent leur historique.',days:DAYS_B}
   };
   var DAYS=DAYS_A;
+  /* Matériel de chaque exercice : il fixe le plus petit cran de charge possible dans ta salle.
+     mac = machine guidée (5 kg), cab = poulie (5 kg), db = haltères (2 kg par haltère, de 2 à 40), bb = barre (2,5 kg). */
+  var EQ={
+    mac:['mer-couche','ven-presse','ven-legcurl','ven-legext','ven-mollets','sam-incline','sam-pecfly','dim-presse','dim-legcurl',
+      'b-mer-couche','b-mer-epaules','b-jeu-oiseau','b-ven-presse','b-ven-legcurl','b-ven-legext','b-ven-mollets','b-dim-legcurl'],
+    cab:['mer-lateral','mer-triceps','jeu-rowing','jeu-tirage','jeu-horiz','jeu-face','sam-tirage','sam-curlpoulie','sam-triceps',
+      'b-mer-ecartes','b-mer-pushdown','b-jeu-tirage','b-jeu-pullover','b-jeu-marteau','b-sam-tirage','b-sam-lateral','b-sam-triceps'],
+    db:['mer-incline','mer-epaules','sam-rowing','b-sam-rowing','jeu-curlinc','jeu-marteau','sam-lateral','dim-bulgares','dim-mollets',
+      'b-mer-incline','b-mer-lateral','b-jeu-rowing','b-jeu-curl','b-ven-fentes','b-sam-couche','b-sam-epaules','b-sam-curl','b-dim-goblet','b-dim-fentes','b-dim-mollets'],
+    bb:['ven-rdl','dim-hip','b-ven-rdl','b-dim-hip']
+  };
+  /* « Machine prise ? » : remplacements proposés pour chaque exercice. Autre matériel, même muscle.
+     Le remplaçant garde son propre historique : la progression de l'exercice prévu n'est jamais touchée. */
+  var ALT={
+    'mer-couche':['b-sam-couche'],'b-mer-couche':['b-sam-couche'],'b-sam-couche':['mer-couche'],
+    'mer-incline':['sam-incline'],'b-mer-incline':['sam-incline'],'sam-incline':['mer-incline'],
+    'mer-epaules':['b-mer-epaules'],'b-sam-epaules':['b-mer-epaules'],'b-mer-epaules':['mer-epaules'],
+    'mer-lateral':['b-mer-lateral'],'b-sam-lateral':['b-mer-lateral'],'b-mer-lateral':['mer-lateral'],'sam-lateral':['mer-lateral'],
+    'mer-triceps':['b-mer-pushdown'],'b-sam-triceps':['b-mer-pushdown'],'sam-triceps':['b-mer-pushdown'],'b-mer-pushdown':['mer-triceps'],
+    'b-mer-ecartes':['sam-pecfly'],'sam-pecfly':['b-mer-ecartes'],
+    'jeu-tirage':['b-jeu-rowing'],'sam-tirage':['b-jeu-rowing'],'b-sam-tirage':['b-jeu-rowing'],'b-jeu-tirage':['jeu-rowing'],
+    'jeu-rowing':['b-jeu-rowing'],'jeu-horiz':['b-jeu-rowing'],'sam-rowing':['jeu-rowing'],'b-sam-rowing':['jeu-rowing'],'b-jeu-rowing':['jeu-rowing'],'b-jeu-pullover':['jeu-rowing'],
+    'jeu-face':['b-jeu-oiseau'],'b-jeu-oiseau':['jeu-face'],
+    'jeu-curlinc':['sam-curlpoulie'],'b-jeu-curl':['sam-curlpoulie'],'b-sam-curl':['sam-curlpoulie'],'sam-curlpoulie':['jeu-curlinc'],
+    'jeu-marteau':['b-jeu-marteau'],'b-jeu-marteau':['jeu-marteau'],
+    'ven-presse':['b-ven-fentes','dim-bulgares'],'b-ven-presse':['dim-bulgares'],
+    'ven-legext':['b-ven-fentes'],'b-ven-legext':['dim-bulgares'],'b-ven-fentes':['b-dim-fentes'],
+    'ven-mollets':['dim-mollets'],'b-ven-mollets':['dim-mollets'],'dim-mollets':['ven-mollets'],'b-dim-mollets':['ven-mollets'],
+    'dim-presse':['b-ven-fentes'],'b-dim-goblet':['dim-presse'],
+    'dim-bulgares':['b-dim-fentes'],'b-dim-fentes':['b-ven-fentes']
+  };
+  function altsOf(id){return ALT[id]||[]}
   var EXMAP={};
   Object.keys(PROGS).forEach(function(k){PROGS[k].days.forEach(function(d){d.ex.forEach(function(e){e.day=d.key;EXMAP[e.id]=e})})});
+  Object.keys(EQ).forEach(function(t){EQ[t].forEach(function(id){if(EXMAP[id])EXMAP[id].eq=t})});
   function dayOf(k){return DAYS.filter(function(d){return d.key===k})[0]}
   function getProg(){var p=S.docs.prefs&&S.docs.prefs.prog;return PROGS[p]?p:'A'}
   function applyProg(){DAYS=PROGS[getProg()].days}
@@ -1058,12 +1143,18 @@ var Muscles=(function(){
   var extra={},notesOpen={},pending=null,deferredInstall=null,swReg=null;
 
   function sid(day,date){return 's_'+date+'_'+day}
+  /* Un exercice de remplacement (« Machine prise ? ») est rangé dans la séance du jour affiché, même s'il vient d'un autre jour du programme. */
+  function entryDay(exId){
+    var cd=S.docs[sid(curDay,curDate)];
+    if(cd&&cd.sub){for(var k in cd.sub){if(cd.sub[k]===exId)return curDay}}
+    return EXMAP[exId].day;
+  }
   function getEntry(exId){
-    var d=S.docs[sid(EXMAP[exId].day,curDate)];
+    var d=S.docs[sid(entryDay(exId),curDate)];
     return (d&&d.ex&&d.ex[exId])||{};
   }
   function setEntry(exId,patch){
-    var day=EXMAP[exId].day,id=sid(day,curDate);
+    var day=entryDay(exId),id=sid(day,curDate);
     var d=S.docs[id];
     if(!d)d=S.docs[id]={kind:'session',date:curDate,day:day,ex:{}};
     if(!d.ex)d.ex={};
@@ -1080,7 +1171,7 @@ var Muscles=(function(){
     if(e.reps){if(last<0)delete e.reps;else if(e.reps.length>last+1)e.reps.length=last+1}
     if(e.s){if(last<0)delete e.s;else if(e.s.length>last+1)e.s.length=last+1}
     if(!(e.w>0)&&last<0&&!(e.r>0)&&!(e.n&&e.n.length))delete d.ex[exId];
-    if(!Object.keys(d.ex).length)delete S.docs[id];
+    if(!Object.keys(d.ex).length&&!(d.sub&&Object.keys(d.sub).length))delete S.docs[id];
     queueWrite();markDone();updateStatus();
   }
   function canon(id){var e=EXMAP[id];return e&&e.alias?e.alias:id}
@@ -1157,15 +1248,52 @@ var Muscles=(function(){
   }
   function dayInfo(key){var a=PROGS.A.days.filter(function(d){return d.key===key})[0];return a||PROGS.A.days[0]}
   function progOfDoc(d){
-    var b=0,a=0;
-    Object.keys(d.ex||{}).forEach(function(k){if(k.indexOf('b-')===0)b++;else a++});
+    var b=0,a=0,rev={};
+    if(d.sub)Object.keys(d.sub).forEach(function(p){rev[d.sub[p]]=p});
+    Object.keys(d.ex||{}).forEach(function(k){var p=rev[k]||k;if(p.indexOf('b-')===0)b++;else a++});
     return b>a?'B':'A';
+  }
+  /* « a des séries » : une charge pré-remplie seule ne compte pas */
+  function hasSets(e){return !!e&&setsDone(e)>0}
+  /* Remplacements d'une séance : {exercice prévu : exercice fait à sa place}.
+     Ceux choisis avec le bouton sont dans d.sub ; on reconnaît aussi les anciennes saisies (variante B faite à la place, sans trace). */
+  function effSub(d,dayObj){
+    var out={},used={},ex=(d&&d.ex)||{},planned={};
+    dayObj.ex.forEach(function(x){planned[x.id]=1});
+    if(d&&d.sub)Object.keys(d.sub).forEach(function(p){
+      if(planned[p]&&EXMAP[d.sub[p]]){out[p]=d.sub[p];used[d.sub[p]]=1}
+    });
+    var extras=Object.keys(ex).filter(function(k){return EXMAP[k]&&!planned[k]&&!used[k]&&hasSets(ex[k])});
+    extras.forEach(function(k){
+      var best=null,br=9;
+      dayObj.ex.forEach(function(x){
+        if(out[x.id]||hasSets(ex[x.id]))return;
+        /* 0 : même exercice (alias) · 1 : remplaçant prévu dans les deux sens · 2 : remplaçant prévu dans un sens */
+        var r=canon(k)===canon(x.id)?0:(altsOf(x.id).indexOf(k)>=0?(altsOf(k).indexOf(x.id)>=0?1:2):9);
+        if(r<br){br=r;best=x.id}
+      });
+      if(best)out[best]=k;
+    });
+    return out;
+  }
+  function dayObjOfDoc(d){return PROGS[progOfDoc(d)].days.filter(function(x){return x.key===d.day})[0]||PROGS.A.days[0]}
+  function docSub(d){return effSub(d,dayObjOfDoc(d))}
+  /* Plus petit cran de charge selon le matériel : machines et poulies 5 kg, haltères 2 kg (de 2 à 40), barre 2,5 kg */
+  var STEPS={mac:5,cab:5,db:2,bb:2.5},DB_MAX=40;
+  function stepOf(ex){return (ex&&STEPS[ex.eq])||2.5}
+  function stepText(ex){
+    var s=stepOf(ex);
+    return '+'+num(s)+' kg'+(ex&&ex.eq==='db'?' par haltère':'');
   }
   function targetOf(ex,h){
     if(!h)return null;
-    var rg=range(ex.r);
-    if(h.min>0&&!h.lg&&h.min>=rg.hi)return {w:Math.round((h.w+2.5)*2)/2,up:true};
-    return {w:h.w,up:false};
+    var rg=range(ex.r),st=stepOf(ex);
+    if(h.min>0&&!h.lg&&h.min>=rg.hi){
+      var nw=Math.round((h.w+st)*100)/100;
+      if(ex.eq==='db'&&nw>DB_MAX)return {w:h.w,up:false,step:st,cap:true};
+      return {w:nw,up:true,step:st,pct:h.w>0?Math.round(st/h.w*100):0};
+    }
+    return {w:h.w,up:false,step:st};
   }
 
   /* ================= Minuteur ================= */
@@ -1293,6 +1421,22 @@ var Muscles=(function(){
     });
     tabsEl.hidden=(view!=='seance');
   }
+  /* exercices affichés pour le jour : l'exercice prévu, ou celui qui le remplace dans la séance en cours */
+  function viewList(d){
+    var cd=S.docs[sid(curDay,curDate)],subs=effSub(cd,d);
+    return d.ex.map(function(slot){return {slot:slot,ex:subs[slot.id]?EXMAP[subs[slot.id]]:slot,sub:subs[slot.id]||null}});
+  }
+  /* dernier remplacement de cet exercice depuis la dernière fois où il a vraiment été fait (pour expliquer pourquoi la date n'est pas récente) */
+  function lastSubNote(slot,pr){
+    var best=null;
+    Object.keys(S.docs).forEach(function(k){
+      var d=S.docs[k];
+      if(d.kind!=='session'||d.day!==slot.day||d.date>=curDate||(pr&&d.date<=pr.date)||!sessionDone(d))return;
+      var a=docSub(d)[slot.id];
+      if(a&&canon(a)!==canon(slot.id)&&(!best||d.date>best.date))best={date:d.date,alt:a};
+    });
+    return best;
+  }
   function goalHtml(ex,pr,rec){
     var rg=range(ex.r),h;
     if(ex.bw){
@@ -1302,29 +1446,41 @@ var Muscles=(function(){
     }
     if(!pr)return '<p class="goal">Première fois : prends une charge qui te laisse 1-2 répétitions en réserve et note-la.</p>';
     if(!(pr.min>0))h='Objectif : reprends <b>'+num(pr.w)+' kg</b> et note tes reps série par série pour suivre ta progression.';
-    else if(pr.min>=rg.hi&&!pr.lg)h='Objectif : <b>monte d\'un cran (≈ '+num(targetOf(ex,pr).w)+' kg)</b>, vise '+rg.lo+' reps ou plus sur chaque série.';
+    else if(pr.min>=rg.hi&&!pr.lg){
+      var t=targetOf(ex,pr);
+      if(t.cap)h='Objectif : tu es au maximum des haltères (<b>'+DB_MAX+' kg</b>). Garde cette charge, ralentis la descente (3 à 4 s), marque une pause en bas et vise plus de reps.';
+      else{
+        h='Objectif : <b>monte à '+num(t.w)+' kg</b> ('+stepText(ex)+'), vise '+rg.lo+' reps ou plus sur chaque série.';
+        if(t.pct>=12)h+='<span class="stepnote">Ce cran pèse '+t.pct+' % de ta charge : retomber sous '+rg.lo+' reps est normal. Reste à '+num(t.w)+' kg jusqu\'à remonter en haut de la fourchette.</span>';
+      }
+    }
     else h='Objectif : <b>'+num(pr.w)+' kg</b>, bats tes reps de la dernière fois série par série, jusqu\'à <b>'+rg.hi+'</b> partout.';
     if(rec&&rec!==pr&&e1rmOf(rec)>e1rmOf(pr)*1.005)h+='<span class="rec">Record : '+num(rec.w)+' kg × '+repsText(rec)+' ('+fmtDate(rec.date)+')</span>';
     return '<p class="goal">'+h+'</p>';
   }
   function deltaInfo(ex,e,pr){
     var bw=!!ex.bw;
-    if(!pr||!logged(ex,e))return {t:'',c:''};
+    /* pas de comparaison tant qu'aucune série n'est saisie ou cochée : une charge pré-remplie n'est pas un progrès */
+    if(!pr||!logged(ex,e)||!(setsDone(e)>0))return {t:'',c:'',s:''};
     var dw=bw?0:Math.round((e.w-pr.w)*100)/100;
-    if(dw>0)return {t:'+'+num(dw)+' kg depuis le '+fmtDate(pr.date),c:'up'};
-    if(dw<0)return {t:num(dw)+' kg depuis le '+fmtDate(pr.date),c:'down'};
+    if(dw>0)return {t:'+'+num(dw)+' kg depuis le '+fmtDate(pr.date),c:'up',s:'+'+num(dw)+' kg'};
+    if(dw<0)return {t:num(dw)+' kg depuis le '+fmtDate(pr.date),c:'down',s:'−'+num(-dw)+' kg'};
     var cur=repsOf(e).reps,m=Math.min(cur.length,pr.reps.length),diff=0,cmp=0,i;
     for(i=0;i<m;i++){if(cur[i]>0&&pr.reps[i]>0){diff+=cur[i]-pr.reps[i];cmp++}}
-    var parts=[],c='eq';
+    var parts=[],sh=[],c='eq';
     if(!pr.lg&&cmp>0&&diff!==0){
-      parts.push((diff>0?'+':'')+diff+(bw&&isSec(ex)?' s':' rep'+(Math.abs(diff)>1?'s':''))+(bw?'':' à charge égale'));
+      var unit=bw&&isSec(ex)?' s':' rep'+(Math.abs(diff)>1?'s':'');
+      parts.push((diff>0?'+':'')+diff+unit+(bw?'':' à charge égale'));
+      sh.push((diff>0?'+':'−')+Math.abs(diff)+unit);
       c=diff>0?'up':'down';
     }
     var ds=setsDone(e)-pr.sets;
-    if(pr.sets>0&&ds>0){parts.push('+'+ds+' série'+(ds>1?'s':''));if(c==='eq')c='up'}
-    if(!parts.length)return {t:(cmp>0&&!pr.lg)||bw?'Identique à la dernière fois':'Même charge que la dernière fois',c:'eq'};
-    return {t:parts.join(' · '),c:c};
+    if(pr.sets>0&&ds>0){parts.push('+'+ds+' série'+(ds>1?'s':''));sh.push('+'+ds+' série'+(ds>1?'s':''));if(c==='eq')c='up'}
+    if(!parts.length)return {t:(cmp>0&&!pr.lg)||bw?'Identique à la dernière fois':'Même charge que la dernière fois',c:'eq',s:'Stable'};
+    return {t:parts.join(' · '),c:c,s:sh.join(' · ')};
   }
+  var ARROW={up:'▲',down:'▼',eq:'='};
+  function pillText(di){return di.c?ARROW[di.c]+' '+di.s:''}
   function setDelta(val,prev,lg){
     if(!(val>0)||!(prev>0)||lg)return {t:'',c:''};
     var d=val-prev;
@@ -1414,18 +1570,25 @@ var Muscles=(function(){
         +'<li>Face pull léger : 1 × 15-20</li>'
         +'<li>2 séries d\'approche sur le premier exercice (50 % puis 75 % de ta charge)</li></ol></details>';
     }
-    var canFill=0,cards='';
-    d.ex.forEach(function(ex,idx){
+    var canFill=0,cards='',vl=viewList(d),taken={},cd0=S.docs[sid(curDay,curDate)],explicit=(cd0&&cd0.sub)||{};
+    vl.forEach(function(v){taken[v.slot.id]=1;taken[v.ex.id]=1});
+    vl.forEach(function(v,idx){
+      var ex=v.ex,slot=v.slot,isSub=!!v.sub;
       var e=getEntry(ex.id),hist=history(ex.id),prv=before(hist,curDate),pr=lastOf(prv),rec=bestOf(prv);
       var di=deltaInfo(ex,e,pr),key=curDate+'|'+ex.id;
       var bw=!!ex.bw,cur=logged(ex,e)?stats(curDate,e,bw):null,pi=cur?prInfo(cur,hist):null;
       var sp=spark(hist.slice(-8).map(e1rmOf));
       if(pr&&!bw&&!(e.w>0))canFill++;
-      cards+='<article class="ex" data-ex="'+ex.id+'"><div class="fig"><span class="order">'+(idx+1)+'</span>'
+      var alts=(isSub||hasSets(e))?[]:altsOf(slot.id).filter(function(a){return EXMAP[a]&&!taken[a]&&canon(a)!==canon(slot.id)});
+      cards+='<article class="ex'+(isSub?' sub':'')+(di.c==='eq'?'':' '+di.c)+'" data-ex="'+ex.id+'" data-slot="'+slot.id+'"><div class="fig"><span class="order">'+(idx+1)+'</span>'
         +'<span class="prb"'+(pi?'':' hidden')+'>Record</span>'
+        +'<span class="pdl '+di.c+'"'+(di.s?'':' hidden')+'>'+esc(pillText(di))+'</span>'
         +'<div class="mv" data-i="'+ex.i+'"></div><div class="mm">'+Muscles.html(ex)+'</div></div><div class="body">'
+        +(isSub?'<div class="subbar"><span><b>Remplace</b> · '+esc(slot.n)+'</span>'
+          +((explicit[slot.id]===ex.id&&!hasSets(e))?'<button type="button" class="swundo" data-slot="'+slot.id+'">Reprendre l\'exercice prévu</button>':'')+'</div>':'')
         +'<h3>'+esc(ex.n)+'</h3>'
-        +'<div class="meta"><span class="chip">'+ex.s+' × '+ex.r+'</span><span class="chip soft">Repos '+ex.rest+'</span></div>'
+        +'<div class="meta"><span class="chip">'+ex.s+' × '+ex.r+'</span><span class="chip soft">Repos '+ex.rest+'</span>'
+        +(bw?'':'<span class="chip soft" title="Plus petit cran de charge de ce matériel">Cran '+stepText(ex)+'</span>')+'</div>'
         +musChips(ex)
         +'<p class="cue">'+esc(ex.cue)+'</p>';
       if(pr&&bw){
@@ -1438,9 +1601,16 @@ var Muscles=(function(){
         cards+='<div class="prior none"><span class="ph"><small>Dernière fois</small></span><span class="pbx"><b>Pas encore de donnée</b></span></div>';
       }
       cards+=goalHtml(ex,pr,rec);
+      if(!isSub){
+        var sn=lastSubNote(slot,pr);
+        if(sn)cards+='<p class="subnote">Remplacé le '+fmtDate(sn.date)+' par « '+esc(EXMAP[sn.alt].n)+' » : '+(pr?'ta progression repart de la séance du '+fmtDate(pr.date)+', rien n\'est perdu.':'pas encore de séance faite sur cet exercice.')+'</p>';
+      }
       cards+='<div class="row"><div class="fields">'
-        +(bw?'<span class="chip soft">Poids du corps</span>':'<label class="fld">Charge (kg)<input type="text" inputmode="decimal" class="inw" value="'+(e.w>0?num(e.w):'')+'" placeholder="'+(pr?num(pr.w):'0')+'"></label>')+'</div>'
-        +'<a class="yt" href="https://www.youtube.com/results?search_query='+encodeURIComponent(ex.q)+'" target="_blank" rel="noopener">Voir la technique</a></div>'
+        +(bw?'<span class="chip soft">Poids du corps</span>':'<label class="fld">Charge (kg'+(ex.eq==='db'?' par haltère':'')+')<input type="text" inputmode="decimal" class="inw" value="'+(e.w>0?num(e.w):'')+'" placeholder="'+(pr?num(pr.w):'0')+'"></label>')+'</div>'
+        +'<div class="acts">'+(alts.length?'<button type="button" class="sw" aria-expanded="false">Machine prise ?</button>':'')
+        +'<a class="yt" href="https://www.youtube.com/results?search_query='+encodeURIComponent(ex.q)+'" target="_blank" rel="noopener">Voir la technique</a></div></div>'
+        +(alts.length?'<div class="swlist" hidden><p class="swh">Remplacer par un exercice équivalent. Ton historique de « '+esc(slot.n)+' » n\'est pas touché.</p>'
+          +alts.map(function(a){var x=EXMAP[a];return '<button type="button" class="swopt" data-slot="'+slot.id+'" data-alt="'+a+'"><b>'+esc(x.n)+'</b><small>'+x.s+' × '+x.r+' · Cran '+stepText(x)+'</small></button>'}).join('')+'</div>':'')
         +'<div class="shead"><span>Série</span><span>'+(isSec(ex)?'Secondes':'Reps')+'</span><span>Dernière fois</span></div>'
         +'<div class="srows" role="group" aria-label="Séries">'+rowsHtml(ex,e,pr,key)+'</div>'
         +(e.r>0&&!Array.isArray(e.reps)?'<p class="legacy">Saisie précédente : '+e.r+' reps (la plus faible des séries).</p>':'')
@@ -1471,24 +1641,26 @@ var Muscles=(function(){
   }
   function recapData(d){
     var prog=progOfDoc(d),dayObj=PROGS[prog].days.filter(function(x){return x.key===d.day})[0]||PROGS.A.days[0];
-    var order={},ids=[];
+    var order={},ids=[],sb=effSub(d,dayObj),rev={};
+    Object.keys(sb).forEach(function(p){rev[sb[p]]=p});
     dayObj.ex.forEach(function(ex,i){order[ex.id]=i});
     Object.keys(d.ex||{}).forEach(function(k){ids.push(k)});
-    ids.sort(function(a,b){return (order[a]===undefined?99:order[a])-(order[b]===undefined?99:order[b])});
+    function ord(k){var o=order[rev[k]||k];return o===undefined?99:o}
+    ids.sort(function(a,b){return ord(a)-ord(b)});
     var rows=[],prs=[],sets=0,up=0,eq=0,down=0;
     ids.forEach(function(id){
       var e=d.ex[id],ex=EXMAP[id];
       if(!ex||!(e.w>0||setsDone(e)>0))return;
       sets+=setsDone(e);
-      if(!logged(ex,e)){rows.push({ex:ex,cur:null,cmp:'none'});return}
+      if(!logged(ex,e)){rows.push({ex:ex,cur:null,cmp:'none',sub:rev[id]?EXMAP[rev[id]]:null});return}
       var h=stats(d.date,e,!!ex.bw),hist=history(id),prv=lastOf(before(hist,d.date));
       var pi=prInfo(h,hist),c=pi?'up':cmpStats(h,prv);
       if(c==='up')up++;else if(c==='down')down++;else if(c==='eq')eq++;
       if(pi)prs.push({ex:ex,pi:pi,h:h});
-      rows.push({ex:ex,cur:h,prev:prv,cmp:c,pi:pi});
+      rows.push({ex:ex,cur:h,prev:prv,cmp:c,pi:pi,sub:rev[id]?EXMAP[rev[id]]:null});
     });
     var done={};rows.forEach(function(r){done[r.ex.id]=1});
-    var missing=dayObj.ex.filter(function(ex){return !done[ex.id]&&!done[canon(ex.id)]});
+    var missing=dayObj.ex.filter(function(ex){return !done[ex.id]&&!done[canon(ex.id)]&&!(sb[ex.id]&&done[sb[ex.id]])});
     var prevS=sessions().filter(function(x){return x.day===d.day&&x.date<d.date}).sort(function(a,b){return a.date<b.date?-1:1});
     var ps=lastOf(prevS),ton=sessionTonnage(d),pton=ps?sessionTonnage(ps):0;
     var dur=(d.t0&&d.t1&&d.t1>d.t0)?Math.round((d.t1-d.t0)/60000):0;
@@ -1524,7 +1696,8 @@ var Muscles=(function(){
       var cm=CMP[x.cmp];
       h+='<li><div class="rn"><b>'+esc(x.ex.n)+'</b>'
         +(x.cur?'<span>'+perfText(x.cur,x.ex)+'</span>':'<span>Séries cochées, sans '+(x.ex.bw?(isSec(x.ex)?'secondes':'reps'):'charge')+'</span>')
-        +(x.prev&&x.cur?'<small>Avant : '+perfText(x.prev,x.ex)+'</small>':'')+'</div>'
+        +(x.prev&&x.cur?'<small>Avant : '+perfText(x.prev,x.ex)+'</small>':'')
+        +(x.sub?'<small class="rfor">À la place de « '+esc(x.sub.n)+' »</small>':'')+'</div>'
         +'<div class="rc '+x.cmp+'" title="'+cm[1]+'"><i aria-hidden="true">'+cm[0]+'</i><small>'+cm[1]+'</small></div></li>';
     });
     h+='</ul></div>';
@@ -1578,6 +1751,14 @@ var Muscles=(function(){
       +'<div class="stat"><b>'+ss.length+'</b><small>séances au total</small></div>'
       +'<div class="stat"><b>'+(tv===null?'–':(tv>0?'+':'')+tv+' %')+'</b><small>volume vs semaine dernière</small></div></div>';
   }
+  function replacedList(exId){
+    var c=canon(exId),out=[];
+    sessions().forEach(function(d){
+      var sb=docSub(d);
+      Object.keys(sb).forEach(function(p){if(canon(p)===c&&canon(sb[p])!==c)out.push({date:d.date,alt:sb[p]})});
+    });
+    return out.sort(function(a,b){return a.date<b.date?1:-1});
+  }
   function exoView(){
     var ids=[],seen={};
     Object.keys(PROGS).forEach(function(pk){PROGS[pk].days.forEach(function(d){d.ex.forEach(function(ex){
@@ -1611,6 +1792,7 @@ var Muscles=(function(){
     var chg=bw?(f.tot>0?Math.round((l.tot-f.tot)/f.tot*100):0):(f.w>0?Math.round((l.w-f.w)/f.w*100):0);
     var bestSet=h.reduce(function(a,x){return x.max>a?x.max:a},0),bestTot=h.reduce(function(a,x){return x.tot>a?x.tot:a},0);
     var nPR=h.filter(function(e){return prInfo(e,h)}).length;
+    var rp=replacedList(pex);
     var out='<div style="--c:var(--'+c+')">'
       +'<select id="pex" aria-label="Exercice">'+opts+'</select>'
       +(bw?'':segHtml('pm',[['charge','Charge'],['1rm','Force estimée (1RM)']],pm))
@@ -1630,6 +1812,11 @@ var Muscles=(function(){
       +'<p>Dernier relevé : <strong>'+perfText(l,ex)+'</strong> ('+fmtDate(l.date)+')</p>'
       +(h.length>1?'<p>Évolution '+(bw?'du total':'de la charge')+' : <strong>'+(chg>0?'+':'')+chg+' %</strong> sur '+h.length+' séances.</p>':'<p>Un seul relevé pour l\'instant : la courbe se dessine dès la deuxième séance.</p>')
       +'</div>';
+    if(rp.length){
+      out+='<div class="card"><h3>Remplacé ('+rp.length+')</h3><p class="sub">Séances où cet exercice a été remplacé (machine prise). Elles ne comptent ni dans la courbe ni dans tes records : la progression reprend là où tu l\'avais laissée.</p><ul class="rplist">';
+      rp.slice(0,6).forEach(function(r){out+='<li><b>'+fmtDate(r.date)+'</b><span>'+esc(EXMAP[r.alt].n)+'</span></li>'});
+      out+='</ul></div>';
+    }
     out+='<div class="card"><h3>Historique</h3><table class="tbl"><thead><tr><th>Date</th><th>'+(bw?'Séries':'Charge')+'</th><th>'+(bw?'Résultat':'Reps')+'</th></tr></thead><tbody>';
     h.slice(-8).reverse().forEach(function(e){out+='<tr><td>'+fmtDate(e.date)+(prInfo(e,h)?' <span class="mini">record</span>':'')+'</td><td>'+(bw?e.sets:num(e.w)+' kg')+'</td><td>'+(bw?perfText(e,ex):e.max>0?repsText(e):'–')+'</td></tr>'});
     return out+'</tbody></table></div></div>';
@@ -1737,7 +1924,8 @@ var Muscles=(function(){
   /* ================= Rendu : règles ================= */
   function rulesHtml(){
     return '<div class="card"><h3>Chaque série compte</h3><p>Arrête-toi à 1-2 répétitions de l\'échec. Les séries confortables ne font rien grandir. Descente contrôlée, amplitude complète, pas de rebond.</p></div>'
-    +'<div class="card"><h3>Progression</h3><p><strong>Double progression :</strong> quand tu atteins le haut de la fourchette sur toutes les séries, tu montes d\'un cran (environ +2,5 kg) et tu repars en bas de la fourchette. L\'objectif du jour est calculé pour toi à partir de la dernière fois.</p><p>Semaine 1 : une série de moins par exercice pour t\'adapter à 5 séances. Deload (volume -40 %) toutes les 6 à 8 semaines, ou dès que tu stagnes et que tout fatigue.</p></div>'
+    +'<div class="card"><h3>Progression</h3><p><strong>Double progression :</strong> quand tu atteins le haut de la fourchette sur toutes les séries, tu montes d\'un cran et tu repars en bas de la fourchette. L\'objectif du jour est calculé pour toi à partir de la dernière fois.</p><p><strong>Ton cran dépend du matériel :</strong> +5 kg sur les machines et les poulies, +2 kg par haltère (de 2 à 40 kg), +2,5 kg à la barre. Quand le cran est gros par rapport à ta charge (poulies légères, élévations latérales), il est normal de retomber en bas de la fourchette : reste à la nouvelle charge jusqu\'à remonter. Une rep ne compte que si elle est propre : pas d\'élan, pas d\'amplitude raccourcie.</p><p>Semaine 1 : une série de moins par exercice pour t\'adapter à 5 séances. Deload (volume -40 %) toutes les 6 à 8 semaines, ou dès que tu stagnes et que tout fatigue.</p></div>'
+    +'<div class="card"><h3>Machine prise ?</h3><ul><li>L\'ordre des exercices est libre : fais celui dont la machine est prise un peu plus tard dans la séance.</li><li>Si elle ne se libère pas, touche <strong>Machine prise ?</strong> sur l\'exercice et choisis un équivalent avec un autre matériel. Ça ne vaut que pour cette séance.</li><li>Le remplaçant garde <strong>son propre historique</strong> : ton objectif et ta courbe sur l\'exercice prévu ne bougent pas. Ils reprennent à ta dernière vraie séance dessus, la machine sera peut-être libre la semaine prochaine.</li><li>Le remplacement est tracé : bandeau sur la carte, bilan de séance, journal, fiche de l\'exercice et export. Les séries du remplaçant comptent dans le volume par muscle.</li></ul></div>'
     +'<div class="card"><h3>Quand changer de programme</h3><ul><li>Pas avant 8 à 12 semaines : c\'est le temps qu\'il faut pour que la progression de charge se voie.</li><li>Plus tôt seulement si tu stagnes sur la plupart des exercices pendant 3-4 séances, malgré un bon sommeil et une alimentation en règle.</li><li>On change les variantes (angle, prise, machine ou haltères), pas la logique : mouvements de base, double progression, 1-2 reps de marge.</li><li>La « confusion musculaire » est un mythe. Changer toutes les semaines t\'empêche de battre tes anciennes performances, donc de progresser.</li></ul></div>'
     +'<div class="card"><h3>Épaule</h3><ul><li>Gêne légère qui disparaît à l\'échauffement : continue.</li><li>Douleur qui monte pendant une série : change de variante (poulie, machine guidée) ou arrête l\'exercice.</li><li>Si ça revient à chaque séance au même endroit pendant plusieurs semaines : kiné.</li></ul></div>'
     +'<div class="card"><h3>Recomposition</h3><ul><li>Calories : légèrement sous ta maintenance, environ -300 à -400 kcal.</li><li>Protéines : autour de 180 g par jour.</li><li>Poids : moyenne hebdomadaire, vise -0,3 à -0,5 kg par semaine.</li><li>Tour de taille au nombril : ta mesure la plus fiable.</li><li>Sommeil : 7 h minimum.</li></ul></div>'
@@ -1810,11 +1998,13 @@ var Muscles=(function(){
   }
   function csvEscape(v){return '"'+String(v).replace(/"/g,'""')+'"'}
   function exportCsv(){
-    var rows=[['date','seance','exercice','charge_kg','series_faites','reps_par_serie','notes']];
+    var rows=[['date','seance','exercice','charge_kg','series_faites','reps_par_serie','notes','remplace']];
     Object.keys(S.docs).map(function(k){return S.docs[k]}).filter(function(d){return d.kind==='session'}).sort(function(a,b){return a.date<b.date?-1:1}).forEach(function(d){
+      var sb=docSub(d),rev={};
+      Object.keys(sb).forEach(function(p){rev[sb[p]]=p});
       Object.keys(d.ex||{}).forEach(function(k){
         var e=d.ex[k],ex=EXMAP[k],rp=repsOf(e);
-        rows.push([d.date,d.day,ex?ex.n:k,e.w||'',setsDone(e),rp.lg?('min '+e.r):rp.reps.map(function(x){return x||''}).join('|'),(e.n||[]).join(' | ')]);
+        rows.push([d.date,d.day,ex?ex.n:k,e.w||'',setsDone(e),rp.lg?('min '+e.r):rp.reps.map(function(x){return x||''}).join('|'),(e.n||[]).join(' | '),rev[k]&&EXMAP[rev[k]]?EXMAP[rev[k]].n:'']);
       });
     });
     var rows2=[['date','poids_kg','tour_de_taille_cm']];
@@ -1849,6 +2039,11 @@ var Muscles=(function(){
         if(!any){skipped++;return}
         var nd={kind:'session',date:d.date,day:d.day,ex:ex};
         if(d.t0>0)nd.t0=+d.t0;if(d.t1>0)nd.t1=+d.t1;
+        if(d.sub&&typeof d.sub==='object'&&!Array.isArray(d.sub)){
+          var sub={};
+          Object.keys(d.sub).forEach(function(p){var a=d.sub[p];if(typeof a==='string'&&EXMAP[p]&&EXMAP[a]&&altsOf(p).indexOf(a)>=0)sub[p]=a});
+          if(Object.keys(sub).length)nd.sub=sub;
+        }
         docs[sid(d.day,d.date)]=nd;nSes++;
       }else if(d.kind==='body'&&DATE_RE.test(d.date||'')&&(d.kg>0||d.waist>0)){
         var nb={kind:'body',date:d.date};if(d.kg>0)nb.kg=+d.kg;if(d.waist>0)nb.waist=+d.waist;
@@ -1876,6 +2071,7 @@ var Muscles=(function(){
             if(!ce||!(ce.w>0||setsDone(ce)>0)){cur.ex[xid]=clone(inc.ex[xid]);any=true}
             else if(JSON.stringify(ce)!==JSON.stringify(inc.ex[xid]))conflicts++;
           });
+          if(inc.sub){cur.sub=cur.sub||{};Object.keys(inc.sub).forEach(function(p){if(!cur.sub[p]){cur.sub[p]=inc.sub[p];any=true}})}
           if(any)added++;
           if(!cur.t0&&inc.t0)cur.t0=inc.t0;if(!cur.t1&&inc.t1)cur.t1=inc.t1;
         }else if(inc.kind==='body'){
@@ -2081,6 +2277,12 @@ var Muscles=(function(){
     var di=deltaInfo(ex,e,pr);
     var p=card.querySelector('.delta');
     p.className='delta '+di.c;p.textContent=di.t;
+    var su=card.querySelector('.swundo');
+    if(su)su.hidden=hasSets(e);
+    var pl_=card.querySelector('.pdl');
+    if(pl_){pl_.className='pdl '+di.c;pl_.textContent=pillText(di);pl_.hidden=!di.s}
+    card.classList.remove('up','down');
+    if(di.c==='up'||di.c==='down')card.classList.add(di.c);
     var pi=logged(ex,e)?prInfo(stats(curDate,e,!!ex.bw),hist):null,b=card.querySelector('.prb');
     if(b)b.hidden=!pi;
     var fin=document.getElementById('finish');
@@ -2106,9 +2308,34 @@ var Muscles=(function(){
     redrawNotes(card);
     var ni=card.querySelector('.nin');if(ni)ni.focus();
   }
+  /* Remplacement d'un exercice pour CETTE séance seulement (machine prise). Le remplaçant a son propre historique. */
+  function doSwap(slotId,altId){
+    var slot=EXMAP[slotId],alt=EXMAP[altId];
+    if(!slot||!alt||altsOf(slotId).indexOf(altId)<0)return;
+    var id=sid(curDay,curDate),d=S.docs[id];
+    if(!d)d=S.docs[id]={kind:'session',date:curDate,day:curDay,ex:{}};
+    if(!d.ex)d.ex={};
+    var pe=d.ex[slotId];
+    if(pe&&!hasSets(pe)&&!(pe.n&&pe.n.length))delete d.ex[slotId];
+    d.sub=d.sub||{};d.sub[slotId]=altId;
+    queueWrite();rerender('keep');
+    toast('Remplacé par « '+alt.n+' ». Ta progression sur « '+slot.n+' » n\'est pas touchée.');
+  }
+  function undoSwap(slotId){
+    var id=sid(curDay,curDate),d=S.docs[id];
+    if(!d||!d.sub||!d.sub[slotId])return;
+    var alt=d.sub[slotId],ae=d.ex&&d.ex[alt];
+    if(hasSets(ae)||(ae&&ae.n&&ae.n.length)){toast('Efface d\'abord les séries et les notes saisies pour revenir à l\'exercice prévu.');return}
+    if(ae&&d.ex)delete d.ex[alt];
+    delete d.sub[slotId];
+    if(!Object.keys(d.sub).length)delete d.sub;
+    if(!Object.keys(d.ex||{}).length&&!d.sub)delete S.docs[id];
+    queueWrite();rerender('keep');updateStatus();markDone();
+  }
   function fillLoads(){
     var d=dayOf(curDay),n=0;
-    d.ex.forEach(function(ex){
+    viewList(d).forEach(function(v){
+      var ex=v.ex;
       if(ex.bw||getEntry(ex.id).w>0)return;
       var pr=lastOf(before(history(ex.id),curDate)),t=targetOf(ex,pr);
       if(t){setEntry(ex.id,{w:t.w});n++}
@@ -2121,6 +2348,16 @@ var Muscles=(function(){
     var t=ev.target;
     var act=t.closest('[data-act]');
     if(act){handleAct(act.getAttribute('data-act'));return}
+    var swb=t.closest('.sw');
+    if(swb){
+      var cl=swb.closest('.ex').querySelector('.swlist');
+      if(cl){cl.hidden=!cl.hidden;swb.setAttribute('aria-expanded',cl.hidden?'false':'true')}
+      return;
+    }
+    var swo=t.closest('.swopt');
+    if(swo){doSwap(swo.getAttribute('data-slot'),swo.getAttribute('data-alt'));return}
+    var swu=t.closest('.swundo');
+    if(swu){undoSwap(swu.getAttribute('data-slot'));return}
     var ntog=t.closest('.ntog');
     if(ntog){var cn=ntog.closest('.ex'),idn=cn.getAttribute('data-ex');setNotesOpen(cn,idn,!notesOpen[idn]);return}
     var nplus=t.closest('.nplus');
@@ -2169,7 +2406,7 @@ var Muscles=(function(){
     if(t.closest('#finish')){finishSession();return}
     if(t.closest('#fill')){fillLoads();return}
     if(t.closest('#reset')){
-      DAYS.forEach(function(d){if(d.key===curDay)d.ex.forEach(function(ex){setEntry(ex.id,{s:null})})});
+      viewList(dayOf(curDay)).forEach(function(v){setEntry(v.ex.id,{s:null})});
       renderSeance();return;
     }
     var pgb=t.closest('[data-pg]');
