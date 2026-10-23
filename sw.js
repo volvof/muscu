@@ -1,6 +1,6 @@
 /* Service worker : l'appli complète est gardée en cache, elle s'ouvre sans réseau.
    Une nouvelle version est installée en arrière-plan puis proposée dans l'appli (bannière « Mettre à jour »). */
-const CACHE = 'ppl-e81fc22b65';
+const CACHE = 'ppl-229f3735d2';
 const ASSETS = [
   './', 'index.html', 'manifest.webmanifest',
   'icon-192.png', 'icon-512.png', 'icon-maskable-512.png',
