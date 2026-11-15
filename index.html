@@ -501,6 +501,24 @@ textarea{display:block;width:100%;border-radius:10px;border:2px solid var(--line
 .fx-tgs .seg{flex:1 1 0;min-width:0;margin:0}
 .fx-tgs .seg button{min-height:38px}
 @media (max-width:360px){.fx-c{min-width:30px;height:30px;font-size:.84rem}.fx-srow{grid-template-columns:44px minmax(0,1fr) auto;padding:12px}.fx-tgs .seg button{font-size:.8rem}}
+.tab.skipped:not([aria-selected="true"]){border-style:dashed;opacity:.65}
+.tab.skipped b{text-decoration:line-through;text-decoration-thickness:1.5px}
+.cu{margin:0 0 14px;padding:12px 14px 6px;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--lower) 55%,var(--line));background:color-mix(in srgb,var(--lower) 10%,var(--surface))}
+.cu h3{margin:0 0 4px;font-size:.95rem}
+.cu-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;padding:8px 0;border-top:1px solid color-mix(in srgb,var(--lower) 25%,var(--line))}
+.cu h3+.cu-row{border-top:0}
+.cu-t{flex:1 1 150px;min-width:0}
+.cu-t b{display:block;border-left:4px solid var(--c);padding-left:8px;line-height:1.25}
+.cu-t small{display:block;padding-left:12px;color:var(--muted);font-size:.84rem}
+.cu-act{display:flex;gap:8px}
+.cu-act button{min-height:44px;padding:0 14px;border-radius:12px;font-weight:700;cursor:pointer}
+.cu-act .go{border:0;background:var(--c);color:var(--on-c)}
+.cu-act .sk{border:1.5px solid color-mix(in srgb,var(--muted) 55%,transparent);background:transparent;color:var(--ink)}
+.movebox{margin:0 0 14px;padding:10px 12px;border-radius:12px;border:1.5px dashed var(--line);background:var(--surface)}
+.movebox p{margin:0 0 8px;color:var(--muted);font-size:.9rem}
+.movebox p b{color:var(--ink)}
+.movebox .seg{margin:0}
+.skipnote{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--ink) 6%,var(--surface));color:var(--muted);font-size:.92rem}
 </style>
 </head>
 <body>
@@ -989,7 +1007,7 @@ var Muscles=(function(){
 <script>
 (function(){
   'use strict';
-  var VERSION='1.5';
+  var VERSION='1.6';
 
 /* ================= Programme ================= */
   var DAYS_A=[
@@ -1465,19 +1483,101 @@ var Muscles=(function(){
     });
     tabsEl.innerHTML=h;
   }
+  /* ---- Semaine d'une séance, report et séance sautée ----
+     Une séance compte pour la semaine où elle était PRÉVUE (celle de l'occurrence du jour la plus proche de la date réelle).
+     Dimanche fait le lundi suivant reste donc dans la semaine du dimanche. Un choix manuel est gardé dans d.wk. */
+  function dowOf(key){var d=PROGS.A.days.filter(function(x){return x.key===key})[0];return d?d.dow:null}
+  function occIn(wk,key){return addDays(wk,(dowOf(key)+6)%7)}
+  function autoWk(key,date){
+    if(dowOf(key)===null)return mondayOf(date);
+    var b=mondayOf(date),best=b,bd=1e9;
+    [-7,0,7].forEach(function(o){
+      var w=addDays(b,o),dd=Math.abs(Math.round((parseD(occIn(w,key))-parseD(date))/86400000));
+      if(dd<bd){bd=dd;best=w}
+    });
+    return best;
+  }
+  function weekKey(d){return (d.wk&&/^\d{4}-\d{2}-\d{2}$/.test(d.wk))?d.wk:autoWk(d.day,d.date)}
+  function effWk(key,date){var d=S.docs[sid(key,date)];return d?weekKey(d):autoWk(key,date)}
+  function skipId(wk,key){return 'k_'+wk+'_'+key}
+  function isSkipped(key,wk){var d=S.docs[skipId(wk,key)];return !!(d&&d.kind==='skip')}
+  function setSkip(key,wk,on){
+    if(on)S.docs[skipId(wk,key)]={kind:'skip',day:key,wk:wk};else delete S.docs[skipId(wk,key)];
+    queueWrite();
+  }
+  function skipCount(wk){
+    var n=0;
+    Object.keys(S.docs).forEach(function(k){var d=S.docs[k];if(d.kind==='skip'&&d.wk===wk)n++});
+    return n;
+  }
+  /* 1 = faite, 2 = sautée, pour la semaine de la date affichée */
   function weekDone(){
     var wk=mondayOf(curDate),set={};
-    Object.keys(S.docs).forEach(function(k){var d=S.docs[k];if(d.kind==='session'&&mondayOf(d.date)===wk&&sessionDone(d))set[d.day]=1});
+    Object.keys(S.docs).forEach(function(k){
+      var d=S.docs[k];
+      if(d.kind==='session'&&sessionDone(d)&&weekKey(d)===wk)set[d.day]=1;
+    });
+    Object.keys(S.docs).forEach(function(k){
+      var d=S.docs[k];
+      if(d.kind==='skip'&&d.wk===wk&&!set[d.day])set[d.day]=2;
+    });
     return set;
   }
   function markDone(){
     var set=weekDone();
     Array.prototype.forEach.call(tabsEl.children,function(b){
-      var k=b.getAttribute('data-k');
-      b.classList.toggle('done',!!set[k]);
-      var lbl=b.querySelector('b').textContent+' '+b.querySelector('small').textContent+(set[k]?' (séance faite cette semaine)':'');
+      var k=b.getAttribute('data-k'),st=set[k]||0;
+      b.classList.toggle('done',st===1);
+      b.classList.toggle('skipped',st===2);
+      var lbl=b.querySelector('b').textContent+' '+b.querySelector('small').textContent+(st===1?' (séance faite cette semaine)':st===2?' (séance sautée cette semaine)':'');
       b.setAttribute('aria-label',lbl);
     });
+  }
+  /* séances prévues aujourd'hui ou ces 3 derniers jours, ni faites ni sautées */
+  function missedList(){
+    var today=ymd(new Date());
+    if(curDate!==today)return [];
+    var ss=sessions();
+    if(!ss.length)return [];
+    var first=ss.reduce(function(a,d){return d.date<a?d.date:a},ss[0].date),out=[];
+    for(var i=0;i<=3;i++){
+      var date=addDays(today,-i),dw=parseD(date).getDay();
+      if(date<first)break;
+      var pd=DAYS.filter(function(x){return x.dow===dw&&!x.rest})[0];
+      if(!pd||pd.key===curDay)continue;
+      var wk=mondayOf(date);
+      if(isSkipped(pd.key,wk))continue;
+      if(ss.some(function(d){return d.day===pd.key&&weekKey(d)===wk}))continue;
+      out.push({day:pd,date:date,wk:wk,today:i===0});
+    }
+    return out;
+  }
+  function catchupHtml(){
+    var ml=missedList();
+    if(!ml.length)return '';
+    var h='<section class="cu" aria-label="Séances à rattraper"><h3>À rattraper</h3>';
+    ml.forEach(function(m){
+      h+='<div class="cu-row" style="--c:var(--'+m.day.c+')"><div class="cu-t"><b>'+m.day.name+' · '+m.day.tag+'</b><small>'
+        +(m.today?'Prévue aujourd\'hui':'Pas faite le '+fmtDateLong(m.date))+'</small></div>'
+        +'<div class="cu-act"><button type="button" class="go" data-cu="go" data-k="'+m.day.key+'">'+(m.today?'Ouvrir':'La faire aujourd\'hui')+'</button>'
+        +'<button type="button" class="sk" data-cu="skip" data-k="'+m.day.key+'" data-wk="'+m.wk+'">Sauter</button></div></div>';
+    });
+    return h+'</section>';
+  }
+  /* séance faite un autre jour que prévu : choix de la semaine où elle compte ; et rappel d'une séance sautée */
+  function moveHtml(d){
+    var h='',own=mondayOf(curDate),eff=effWk(curDay,curDate);
+    if(parseD(curDate).getDay()!==d.dow){
+      var oc=occIn(own,curDay),other=oc>curDate?addDays(own,-7):addDays(own,7),ws=[own,other].sort();
+      h+='<div class="movebox" role="group" aria-label="Semaine de la séance"><p>Séance du <b>'+d.name.toLowerCase()+'</b> faite un <b>'
+        +parseD(curDate).toLocaleDateString('fr-FR',{weekday:'long'})+'</b>. Elle compte pour :</p><div class="seg">';
+      ws.forEach(function(w){h+='<button type="button" data-wkpick="'+w+'" aria-pressed="'+(eff===w?'true':'false')+'">Semaine du '+fmtDate(w)+'</button>'});
+      h+='</div></div>';
+    }
+    if(isSkipped(curDay,eff)){
+      h+='<div class="skipnote"><span>Séance sautée pour la semaine du '+fmtDate(eff)+'.</span><button type="button" class="ghost" data-unskip="'+curDay+'" data-wk="'+eff+'">Reprendre</button></div>';
+    }
+    return h;
   }
   function markTabs(){
     Array.prototype.forEach.call(tabsEl.children,function(b){
@@ -1616,7 +1716,7 @@ var Muscles=(function(){
   }
   function renderRest(d){
     var nx=nextTraining(d);
-    var h='<div style="--c:var(--'+d.c+')"><div class="dayhead"><div class="when">'+d.name+'</div><h2>Repos</h2><p>'+d.sub+' · aucune séance</p></div>'
+    var h='<div style="--c:var(--'+d.c+')">'+catchupHtml()+'<div class="dayhead"><div class="when">'+d.name+'</div><h2>Repos</h2><p>'+d.sub+' · aucune séance</p></div>'
       +'<div class="restcard"><h3>Pas de séance aujourd\'hui</h3><p>Le muscle se construit pendant la récupération, pas pendant la séance. Après six séances dans la semaine, c\'est ce jour-là que tu rattrapes la fatigue. Si tu le sautes, tu le paies à la séance suivante.</p></div>'
       +'<div class="restcard"><h3>Ce qui reste au programme</h3><ul>'
       +'<li><b>Dormir</b> 7 h minimum : c\'est la moitié du travail.</li>'
@@ -1630,12 +1730,13 @@ var Muscles=(function(){
   function renderSeance(){
     var d=dayOf(curDay),cp=getProg();
     if(d.rest){renderRest(d);return}
-    var h='<div style="--c:var(--'+d.c+')">';
+    var h='<div style="--c:var(--'+d.c+')">'+catchupHtml();
     h+='<div class="seg" role="group" aria-label="Programme">';
     Object.keys(PROGS).forEach(function(k){h+='<button type="button" data-pg="'+k+'" aria-pressed="'+(cp===k?'true':'false')+'">'+PROGS[k].label+'</button>'});
     h+='</div><p class="pgnote">'+esc(PROGS[cp].note)+'</p>';
     h+='<div class="dayhead"><div class="when">'+d.name+'</div><h2>'+d.tag+'</h2><p>'+d.sub+' · '+d.ex.length+' exercices · '+(d.dur||'60 à 75 min')+'</p>'
       +'<div class="datepick"><label for="sdate">Séance du</label><input type="date" id="sdate" value="'+curDate+'" max="'+ymd(new Date())+'"></div></div>';
+    h+=moveHtml(d);
     if(d.warm){
       h+='<details class="warm" open><summary>Échauffement épaules (5 min)</summary><ol>'
         +'<li>Rotation externe à la poulie, coude collé : 2 × 15, très léger</li>'
@@ -1695,6 +1796,7 @@ var Muscles=(function(){
     h+=cards;
     var cd=S.docs[sid(curDay,curDate)],has=cd&&sessionDone(cd);
     h+='<div class="tools"><button type="button" class="ghost" id="reset">Décocher les séries</button>'
+      +((has||isSkipped(curDay,effWk(curDay,curDate)))?'':'<button type="button" class="ghost" id="skipbtn">Sauter cette séance</button>')
       +'<button type="button" class="primary" id="finish"'+(has?'':' disabled')+'>Terminer la séance</button></div></div>';
     main.innerHTML=h;
     Array.prototype.forEach.call(main.querySelectorAll('.mv[data-i]'),function(n){n.appendChild(Fig.create(n.getAttribute('data-i'),'anim'))});
@@ -1814,12 +1916,13 @@ var Muscles=(function(){
     var thisW=0,tonThis=0,tonPrev=0;
     ss.forEach(function(d){
       var w=mondayOf(d.date);
-      if(w===wk){thisW++;tonThis+=sessionTonnage(d)}
+      if(weekKey(d)===wk)thisW++;
+      if(w===wk)tonThis+=sessionTonnage(d);
       else if(w===pwk)tonPrev+=sessionTonnage(d);
     });
     var tv=(tonPrev>0&&tonThis>0)?Math.round((tonThis-tonPrev)/tonPrev*100):null;
     return '<div class="stats">'
-      +'<div class="stat"><b>'+thisW+' / 6</b><small>cette semaine</small></div>'
+      +'<div class="stat"><b>'+thisW+' / '+Math.max(6-skipCount(wk),thisW)+'</b><small>cette semaine</small></div>'
       +'<div class="stat"><b>'+ss.length+'</b><small>séances au total</small></div>'
       +'<div class="stat"><b>'+(tv===null?'–':(tv>0?'+':'')+tv+' %')+'</b><small>volume vs sem. dernière</small></div></div>';
   }
@@ -2081,7 +2184,7 @@ var Muscles=(function(){
       var w=mondayOf(d.date),di=dayInfo(d.day),prog=progOfDoc(d);
       if(w!==lastW){h+='<h3 class="jwk">Semaine du '+fmtDate(w)+'</h3>';lastW=w}
       var r=recapData(d),idn=sid(d.day,d.date);
-      h+='<button type="button" class="jrow" data-recap="'+esc(idn)+'" style="--c:var(--'+di.c+')"><span class="jd"><b>'+fmtDateLong(d.date)+'</b><small>'+di.tag+(di.shared?'':' · programme '+prog)+'</small></span>'
+      h+='<button type="button" class="jrow" data-recap="'+esc(idn)+'" style="--c:var(--'+di.c+')"><span class="jd"><b>'+fmtDateLong(d.date)+'</b><small>'+di.tag+(di.shared?'':' · programme '+prog)+(weekKey(d)!==w?' · rattrapage':'')+'</small></span>'
         +'<span class="jm">'+r.rows.length+' exos · '+r.sets+' séries'+(r.ton>0?' · '+num(Math.round(r.ton/100)/10)+' t':'')+'</span>'
         +(r.prs.length?'<span class="mini prx">'+plural(r.prs.length,'record')+'</span>':'')+'<i aria-hidden="true">›</i></button>';
     });
@@ -2110,6 +2213,7 @@ var Muscles=(function(){
     +'<div class="card"><h3>Quand changer de programme</h3><ul><li>Pas avant 8 à 12 semaines : c\'est le temps qu\'il faut pour que la progression de charge se voie.</li><li>Plus tôt seulement si tu stagnes sur la plupart des exercices pendant 3-4 séances, malgré un bon sommeil et une alimentation en règle.</li><li>On change les variantes (angle, prise, machine ou haltères), pas la logique : mouvements de base, double progression, 1-2 reps de marge.</li><li>La « confusion musculaire » est un mythe. Changer toutes les semaines t\'empêche de battre tes anciennes performances, donc de progresser.</li></ul></div>'
     +'<div class="card"><h3>Épaule</h3><ul><li>Gêne légère qui disparaît à l\'échauffement : continue.</li><li>Douleur qui monte pendant une série : change de variante (poulie, machine guidée) ou arrête l\'exercice.</li><li>Si ça revient à chaque séance au même endroit pendant plusieurs semaines : kiné.</li></ul></div>'
     +'<div class="card"><h3>Recomposition</h3><ul><li>Calories : légèrement sous ta maintenance, environ -300 à -400 kcal.</li><li>Protéines : autour de 180 g par jour.</li><li>Poids : moyenne hebdomadaire, vise -0,3 à -0,5 kg par semaine.</li><li>Tour de taille au nombril : ta mesure la plus fiable.</li><li>Sommeil : 7 h minimum.</li></ul></div>'
+    +'<div class="card"><h3>Séance manquée ou déplacée</h3><p>Un empêchement un jour ? Rien à déplacer à la main : le lendemain, la séance non faite apparaît en haut de l\'écran Séance, dans <strong>À rattraper</strong>. Touche <strong>La faire aujourd\'hui</strong> : elle reste comptée dans la semaine où elle était prévue (le dimanche fait le lundi suivant compte pour la semaine du dimanche). Si une autre séance prévue ce jour-là te gêne, par exemple les abdos du lundi, touche <strong>Sauter</strong> : elle est retirée de la semaine et le compteur s\'adapte. Une séance faite un autre jour que prévu te laisse choisir la semaine où elle compte.</p></div>'
     +'<div class="card"><h3>Lundi et mardi</h3><p><strong>Lundi</strong> : abdos à la maison, 20 à 25 minutes, sans matériel. Mêmes règles qu\'en salle : propre, lent, une ou deux répétitions de marge. Quand tu atteins le haut de la fourchette sur toutes les séries, passe à la variante plus dure indiquée sur la fiche.</p><p><strong>Mardi</strong> : repos complet. Tu marches (8 000 à 10 000 pas par jour, tous les jours), tu dors, tu manges.</p><p>Les abdos ne font pas fondre le ventre : ton tour de taille baisse avec le déficit calorique, pas avec les séries d\'abdos. Cette séance rend le tronc plus fort et plus stable pour tes charges lourdes, rien de plus.</p></div>';
   }
 
@@ -2220,6 +2324,7 @@ var Muscles=(function(){
         if(!any){skipped++;return}
         var nd={kind:'session',date:d.date,day:d.day,ex:ex};
         if(d.t0>0)nd.t0=+d.t0;if(d.t1>0)nd.t1=+d.t1;
+        if(DATE_RE.test(d.wk||'')&&parseD(d.wk).getDay()===1)nd.wk=d.wk;
         if(d.sub&&typeof d.sub==='object'&&!Array.isArray(d.sub)){
           var sub={};
           Object.keys(d.sub).forEach(function(p){var a=d.sub[p];if(typeof a==='string'&&EXMAP[p]&&EXMAP[a]&&altsOf(p).indexOf(a)>=0)sub[p]=a});
@@ -2229,6 +2334,8 @@ var Muscles=(function(){
       }else if(d.kind==='body'&&DATE_RE.test(d.date||'')&&(d.kg>0||d.waist>0)){
         var nb={kind:'body',date:d.date};if(d.kg>0)nb.kg=+d.kg;if(d.waist>0)nb.waist=+d.waist;
         docs['b_'+d.date]=nb;nBody++;
+      }else if(d.kind==='skip'&&DATE_RE.test(d.wk||'')&&DAYKEYS.indexOf(d.day)>=0){
+        docs[skipId(d.wk,d.day)]={kind:'skip',day:d.day,wk:d.wk};
       }else if(d.kind==='prefs'){
         if(PROGS[d.prog])docs.prefs={kind:'prefs',prog:d.prog};
       }else skipped++;
@@ -2244,7 +2351,7 @@ var Muscles=(function(){
     else{
       Object.keys(imp.docs).forEach(function(id){
         var inc=imp.docs[id],cur=S.docs[id];
-        if(!cur){S.docs[id]=clone(inc);added++;return}
+        if(!cur){S.docs[id]=clone(inc);if(inc.kind!=='skip')added++;return}
         if(inc.kind==='session'){
           var any=false;
           Object.keys(inc.ex).forEach(function(xid){
@@ -2255,6 +2362,7 @@ var Muscles=(function(){
           if(inc.sub){cur.sub=cur.sub||{};Object.keys(inc.sub).forEach(function(p){if(!cur.sub[p]){cur.sub[p]=inc.sub[p];any=true}})}
           if(any)added++;
           if(!cur.t0&&inc.t0)cur.t0=inc.t0;if(!cur.t1&&inc.t1)cur.t1=inc.t1;
+          if(!cur.wk&&inc.wk)cur.wk=inc.wk;
         }else if(inc.kind==='body'){
           if(!(cur.kg>0)&&inc.kg>0){cur.kg=inc.kg;added++}
           if(!(cur.waist>0)&&inc.waist>0){cur.waist=inc.waist;added++}
@@ -2616,6 +2724,25 @@ var Muscles=(function(){
       if(PROGS[np]&&np!==getProg()){S.docs.prefs={kind:'prefs',prog:np};queueWrite();rerender()}
       return;
     }
+    var cu=t.closest('[data-cu]');
+    if(cu){
+      var ck=cu.getAttribute('data-k');
+      if(cu.getAttribute('data-cu')==='go'){curDay=ck;curDate=ymd(new Date());dateAuto=true;store.set('ppl3:last',curDay);rerender();window.scrollTo(0,0)}
+      else{setSkip(ck,cu.getAttribute('data-wk'),true);toast('Séance sautée pour cette semaine.');rerender('keep')}
+      return;
+    }
+    var wkp=t.closest('[data-wkpick]');
+    if(wkp){
+      var wv=wkp.getAttribute('data-wkpick'),sidc=sid(curDay,curDate),dd=S.docs[sidc];
+      if(!dd)dd=S.docs[sidc]={kind:'session',date:curDate,day:curDay,ex:{}};
+      if(wv===autoWk(curDay,curDate))delete dd.wk;else dd.wk=wv;
+      queueWrite();markDone();rerender('keep');return;
+    }
+    var uns=t.closest('[data-unskip]');
+    if(uns){setSkip(uns.getAttribute('data-unskip'),uns.getAttribute('data-wk'),false);rerender('keep');return}
+    if(t.closest('#skipbtn')){
+      setSkip(curDay,effWk(curDay,curDate),true);toast('Séance sautée pour cette semaine.');rerender('keep');return;
+    }
     var fxo=t.closest('[data-fx]');
     if(fxo){openFiche(fxo.getAttribute('data-fx'));return}
     if(t.closest('#fxback')){closeFiche();return}
@@ -2721,6 +2848,8 @@ var Muscles=(function(){
 
   /* ================= Démarrage ================= */
   applyTheme();
+  /* pas de restauration automatique du défilement au rechargement : l'écran s'ouvre en haut, bandeaux visibles */
+  try{window.history.scrollRestoration='manual'}catch(e){}
   var hash=(location.hash||'').replace('#','');
   if(hash==='progres'||hash==='plus')view=hash;
   pickDay();
